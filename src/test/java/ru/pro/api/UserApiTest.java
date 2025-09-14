@@ -11,9 +11,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.pro.api.controller.UserController;
+import ru.pro.model.dto.OrderDto;
 import ru.pro.model.dto.UserDto;
+import ru.pro.model.enums.OrderStatus;
 import ru.pro.service.UserService;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,6 +31,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(UserController.class)
@@ -60,8 +64,7 @@ class UserApiTest {
         mockMvc.perform(get("/api/v1/users")
                         .accept(APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().json(objectMapper.writeValueAsString(List.of(user))));
+                .andExpect(content().contentType(APPLICATION_JSON));
     }
 
     @Test
@@ -131,5 +134,54 @@ class UserApiTest {
         mockMvc.perform(get("/api/v1/users/{id}", id)
                         .accept(APPLICATION_JSON))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("GET /api/v1/users — JSON View UserSummary (без orders)")
+    void testGetAllUsersJsonView() throws Exception {
+        UserDto user = new UserDto(
+                UUID.randomUUID(),
+                "Alice",
+                "alice@example.com",
+                List.of(new OrderDto(UUID.randomUUID(), "Order1", 2, BigDecimal.TEN, OrderStatus.NEW))
+        );
+
+        when(userService.findAll()).thenReturn(List.of(user));
+
+        mockMvc.perform(get("/api/v1/users")
+                        .accept(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON))
+                // должны быть только id, name, email
+                .andExpect(jsonPath("$[0].id").value(user.id().toString()))
+                .andExpect(jsonPath("$[0].name").value("Alice"))
+                .andExpect(jsonPath("$[0].email").value("alice@example.com"))
+                // orders НЕ должен сериализоваться в UserSummary
+                .andExpect(jsonPath("$[0].orders").doesNotExist());
+    }
+
+    @Test
+    @DisplayName("GET /api/v1/users/{id} — JSON View UserDetails (включает orders)")
+    void testGetUserByIdJsonView() throws Exception {
+        UUID id = UUID.randomUUID();
+        OrderDto order = new OrderDto(UUID.randomUUID(), "Order1", 2, BigDecimal.TEN, OrderStatus.NEW);
+        UserDto user = new UserDto(id, "Bob", "bob@example.com", List.of(order));
+
+        when(userService.findById(id)).thenReturn(user);
+
+        mockMvc.perform(get("/api/v1/users/{id}", id)
+                        .accept(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON))
+                // должны быть id, name, email
+                .andExpect(jsonPath("$.id").value(id.toString()))
+                .andExpect(jsonPath("$.name").value("Bob"))
+                .andExpect(jsonPath("$.email").value("bob@example.com"))
+                // orders должен присутствовать
+                .andExpect(jsonPath("$.orders[0].id").value(order.id().toString()))
+                .andExpect(jsonPath("$.orders[0].name").value("Order1"))
+                .andExpect(jsonPath("$.orders[0].items").value(2))
+                .andExpect(jsonPath("$.orders[0].amount").value(10))
+                .andExpect(jsonPath("$.orders[0].status").value("NEW"));
     }
 }
