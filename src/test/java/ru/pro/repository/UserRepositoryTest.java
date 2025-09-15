@@ -32,21 +32,21 @@ class UserRepositoryTest {
     void testFindAll() {
         List<UserEntity> users = userRepository.findAll();
         assertThat(users).isNotEmpty();
-        assertThat(users.size()).isGreaterThanOrEqualTo(2);
+        assertThat(users.size()).isGreaterThanOrEqualTo(10);
         assertThat(users).extracting(UserEntity::getName)
-                .containsExactlyInAnyOrder("Alice", "Bob");
+                .containsExactlyInAnyOrder("User1", "User2", "User3", "User4","User5", "User6", "User7","User8", "User9", "User10");
     }
 
     @Test
     void testFindById() {
         UserEntity alice = userRepository.findAll().stream()
-                .filter(u -> u.getName().equals("Alice"))
+                .filter(u -> u.getName().equals("User1"))
                 .findFirst()
                 .orElseThrow();
 
         Optional<UserEntity> found = userRepository.findById(alice.getId());
         assertThat(found).isPresent();
-        assertThat(found.get().getEmail()).isEqualTo("alice@example.com");
+        assertThat(found.get().getEmail()).isEqualTo("user1@example.com");
     }
 
     @Test
@@ -61,7 +61,7 @@ class UserRepositoryTest {
     @Test
     void testDeleteById() {
         UserEntity alice = userRepository.findAll().stream()
-                .filter(u -> u.getName().equals("Alice"))
+                .filter(u -> u.getName().equals("User1"))
                 .findFirst()
                 .orElseThrow();
 
@@ -70,7 +70,7 @@ class UserRepositoryTest {
 
         assertThat(userRepository.findAll())
                 .extracting(UserEntity::getName)
-                .doesNotContain("Alice");
+                .doesNotContain("User1");
     }
 
     @Test
@@ -91,7 +91,7 @@ class UserRepositoryTest {
 
     @Test
     void testSaveUserWithDuplicateEmailThrowsException() {
-        UserEntity duplicate = new UserEntity(null, "DuplicateAlice", "alice@example.com");
+        UserEntity duplicate = new UserEntity(null, "DuplicateAlice", "user1@example.com");
 
         assertThatThrownBy(() -> userRepository.saveAndFlush(duplicate))
                 .isInstanceOf(DataIntegrityViolationException.class);
