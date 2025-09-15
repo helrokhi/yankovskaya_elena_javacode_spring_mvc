@@ -1,0 +1,38 @@
+databaseChangeLog:
+  - changeSet:
+      id: 005
+      author: Elena_Yankovskaya
+      changes:
+        - createTable:
+            tableName: books_authors
+            columns:
+              - column:
+                  name: book_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: author_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            tableName: books_authors
+            columnNames: book_id, author_id
+            constraintName: pk_books_authors
+
+        - addForeignKeyConstraint:
+            baseTableName: books_authors
+            baseColumnNames: book_id
+            referencedTableName: books
+            referencedColumnNames: id
+            constraintName: fk_books_authors_book
+            onDelete: CASCADE
+
+        - addForeignKeyConstraint:
+            baseTableName: books_authors
+            baseColumnNames: author_id
+            referencedTableName: authors
+            referencedColumnNames: id
+            constraintName: fk_books_authors_author
+            onDelete: CASCADE

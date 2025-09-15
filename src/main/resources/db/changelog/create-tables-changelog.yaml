@@ -7,3 +7,6 @@ databaseChangeLog:
       file: 002-create-books.yaml
       relativeToChangelogFile: true
 
+  - include:
+      file: 005_create_books_authors.yaml
+      relativeToChangelogFile: true

@@ -15,13 +15,11 @@ import static org.mapstruct.NullValuePropertyMappingStrategy.IGNORE;
 public interface BookMapper {
     BookDto toDto(BookEntity entity);
 
-    @Mapping(target = "author", ignore = true)
     BookEntity toEntity(BookDto dto);
 
     List<BookDto> toDtoList(List<BookEntity> entities);
 
     @BeanMapping(nullValuePropertyMappingStrategy = IGNORE)
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "author", ignore = true)
     void updateEntity(BookDto source, @MappingTarget BookEntity target);
 }

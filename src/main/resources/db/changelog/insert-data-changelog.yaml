@@ -6,3 +6,7 @@ databaseChangeLog:
   - include:
       file: 004-insert-books.yaml
       relativeToChangelogFile: true
+
+  - include:
+      file: 006_insert_books_authors.yaml
+      relativeToChangelogFile: true
