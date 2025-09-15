@@ -1,0 +1,204 @@
+databaseChangeLog:
+  - changeSet:
+      id: 004
+      author: Elena_Yankovskaya
+      changes:
+        # J.K. Rowling
+        - insert:
+            tableName: books
+            columns:
+              - column: { name: id, value: "11111111-aaaa-aaaa-aaaa-000000000001" }
+              - column: { name: author_id, value: "11111111-1111-1111-1111-111111111111" }
+              - column: { name: title, value: "Harry Potter and the Philosopher's Stone" }
+              - column: { name: published_date, valueNumeric: 1997 }
+              - column: { name: genre, value: "FANTASY" }
+              - column: { name: language, value: "EN" }
+        - insert:
+            tableName: books
+            columns:
+              - column: { name: id, value: "11111111-aaaa-aaaa-aaaa-000000000002" }
+              - column: { name: author_id, value: "11111111-1111-1111-1111-111111111111" }
+              - column: { name: title, value: "Harry Potter and the Chamber of Secrets" }
+              - column: { name: published_date, valueNumeric: 1998 }
+              - column: { name: genre, value: "FANTASY" }
+              - column: { name: language, value: "EN" }
+
+        # George Orwell
+        - insert:
+            tableName: books
+            columns:
+              - column: { name: id, value: "22222222-bbbb-bbbb-bbbb-000000000001" }
+              - column: { name: author_id, value: "22222222-2222-2222-2222-222222222222" }
+              - column: { name: title, value: "1984" }
+              - column: { name: published_date, valueNumeric: 1949 }
+              - column: { name: genre, value: "DYSTOPIA" }
+              - column: { name: language, value: "EN" }
+        - insert:
+            tableName: books
+            columns:
+              - column: { name: id, value: "22222222-bbbb-bbbb-bbbb-000000000002" }
+              - column: { name: author_id, value: "22222222-2222-2222-2222-222222222222" }
+              - column: { name: title, value: "Animal Farm" }
+              - column: { name: published_date, valueNumeric: 1945 }
+              - column: { name: genre, value: "SATIRE" }
+              - column: { name: language, value: "EN" }
+
+        # Agatha Christie
+        - insert:
+            tableName: books
+            columns:
+              - column: { name: id, value: "33333333-cccc-cccc-cccc-000000000001" }
+              - column: { name: author_id, value: "33333333-3333-3333-3333-333333333333" }
+              - column: { name: title, value: "Murder on the Orient Express" }
+              - column: { name: published_date, valueNumeric: 1934 }
+              - column: { name: genre, value: "DETECTIVE" }
+              - column: { name: language, value: "EN" }
+        - insert:
+            tableName: books
+            columns:
+              - column: { name: id, value: "33333333-cccc-cccc-cccc-000000000002" }
+              - column: { name: author_id, value: "33333333-3333-3333-3333-333333333333" }
+              - column: { name: title, value: "And Then There Were None" }
+              - column: { name: published_date, valueNumeric: 1939 }
+              - column: { name: genre, value: "DETECTIVE" }
+              - column: { name: language, value: "EN" }
+
+        # Leo Tolstoy
+        - insert:
+            tableName: books
+            columns:
+              - column: { name: id, value: "44444444-dddd-dddd-dddd-000000000001" }
+              - column: { name: author_id, value: "44444444-4444-4444-4444-444444444444" }
+              - column: { name: title, value: "War and Peace" }
+              - column: { name: published_date, valueNumeric: 1869 }
+              - column: { name: genre, value: "HISTORICAL" }
+              - column: { name: language, value: "RU" }
+        - insert:
+            tableName: books
+            columns:
+              - column: { name: id, value: "44444444-dddd-dddd-dddd-000000000002" }
+              - column: { name: author_id, value: "44444444-4444-4444-4444-444444444444" }
+              - column: { name: title, value: "Anna Karenina" }
+              - column: { name: published_date, valueNumeric: 1877 }
+              - column: { name: genre, value: "ROMANCE" }
+              - column: { name: language, value: "RU" }
+
+        # Mark Twain
+        - insert:
+            tableName: books
+            columns:
+              - column: { name: id, value: "55555555-eeee-eeee-eeee-000000000001" }
+              - column: { name: author_id, value: "55555555-5555-5555-5555-555555555555" }
+              - column: { name: title, value: "The Adventures of Tom Sawyer" }
+              - column: { name: published_date, valueNumeric: 1876 }
+              - column: { name: genre, value: "ADVENTURE" }
+              - column: { name: language, value: "EN" }
+        - insert:
+            tableName: books
+            columns:
+              - column: { name: id, value: "55555555-eeee-eeee-eeee-000000000002" }
+              - column: { name: author_id, value: "55555555-5555-5555-5555-555555555555" }
+              - column: { name: title, value: "Adventures of Huckleberry Finn" }
+              - column: { name: published_date, valueNumeric: 1884 }
+              - column: { name: genre, value: "ADVENTURE" }
+              - column: { name: language, value: "EN" }
+
+        # Ernest Hemingway
+        - insert:
+            tableName: books
+            columns:
+              - column: { name: id, value: "66666666-ffff-ffff-ffff-000000000001" }
+              - column: { name: author_id, value: "66666666-6666-6666-6666-666666666666" }
+              - column: { name: title, value: "The Old Man and the Sea" }
+              - column: { name: published_date, valueNumeric: 1952 }
+              - column: { name: genre, value: "NOVEL" }
+              - column: { name: language, value: "EN" }
+        - insert:
+            tableName: books
+            columns:
+              - column: { name: id, value: "66666666-ffff-ffff-ffff-000000000002" }
+              - column: { name: author_id, value: "66666666-6666-6666-6666-666666666666" }
+              - column: { name: title, value: "For Whom the Bell Tolls" }
+              - column: { name: published_date, valueNumeric: 1940 }
+              - column: { name: genre, value: "NOVEL" }
+              - column: { name: language, value: "EN" }
+
+        # Fyodor Dostoevsky
+        - insert:
+            tableName: books
+            columns:
+              - column: { name: id, value: "77777777-aaaa-aaaa-aaaa-000000000001" }
+              - column: { name: author_id, value: "77777777-7777-7777-7777-777777777777" }
+              - column: { name: title, value: "Crime and Punishment" }
+              - column: { name: published_date, valueNumeric: 1866 }
+              - column: { name: genre, value: "PHILOSOPHY" }
+              - column: { name: language, value: "RU" }
+        - insert:
+            tableName: books
+            columns:
+              - column: { name: id, value: "77777777-aaaa-aaaa-aaaa-000000000002" }
+              - column: { name: author_id, value: "77777777-7777-7777-7777-777777777777" }
+              - column: { name: title, value: "The Brothers Karamazov" }
+              - column: { name: published_date, valueNumeric: 1880 }
+              - column: { name: genre, value: "PHILOSOPHY" }
+              - column: { name: language, value: "RU" }
+
+        # Jane Austen
+        - insert:
+            tableName: books
+            columns:
+              - column: { name: id, value: "88888888-bbbb-bbbb-bbbb-000000000001" }
+              - column: { name: author_id, value: "88888888-8888-8888-8888-888888888888" }
+              - column: { name: title, value: "Pride and Prejudice" }
+              - column: { name: published_date, valueNumeric: 1813 }
+              - column: { name: genre, value: "ROMANCE" }
+              - column: { name: language, value: "EN" }
+        - insert:
+            tableName: books
+            columns:
+              - column: { name: id, value: "88888888-bbbb-bbbb-bbbb-000000000002" }
+              - column: { name: author_id, value: "88888888-8888-8888-8888-888888888888" }
+              - column: { name: title, value: "Sense and Sensibility" }
+              - column: { name: published_date, valueNumeric: 1811 }
+              - column: { name: genre, value: "ROMANCE" }
+              - column: { name: language, value: "EN" }
+
+        # Charles Dickens
+        - insert:
+            tableName: books
+            columns:
+              - column: { name: id, value: "99999999-cccc-cccc-cccc-000000000001" }
+              - column: { name: author_id, value: "99999999-9999-9999-9999-999999999999" }
+              - column: { name: title, value: "Oliver Twist" }
+              - column: { name: published_date, valueNumeric: 1838 }
+              - column: { name: genre, value: "NOVEL" }
+              - column: { name: language, value: "EN" }
+        - insert:
+            tableName: books
+            columns:
+              - column: { name: id, value: "99999999-cccc-cccc-cccc-000000000002" }
+              - column: { name: author_id, value: "99999999-9999-9999-9999-999999999999" }
+              - column: { name: title, value: "A Tale of Two Cities" }
+              - column: { name: published_date, valueNumeric: 1859 }
+              - column: { name: genre, value: "HISTORICAL" }
+              - column: { name: language, value: "EN" }
+
+        # J.R.R. Tolkien
+        - insert:
+            tableName: books
+            columns:
+              - column: { name: id, value: "10101010-dddd-dddd-dddd-000000000001" }
+              - column: { name: author_id, value: "10101010-1010-1010-1010-101010101010" }
+              - column: { name: title, value: "The Hobbit" }
+              - column: { name: published_date, valueNumeric: 1937 }
+              - column: { name: genre, value: "FANTASY" }
+              - column: { name: language, value: "EN" }
+        - insert:
+            tableName: books
+            columns:
+              - column: { name: id, value: "10101010-dddd-dddd-dddd-000000000002" }
+              - column: { name: author_id, value: "10101010-1010-1010-1010-101010101010" }
+              - column: { name: title, value: "The Lord of the Rings: The Fellowship of the Ring" }
+              - column: { name: published_date, valueNumeric: 1954 }
+              - column: { name: genre, value: "FANTASY" }
+              - column: { name: language, value: "EN" }

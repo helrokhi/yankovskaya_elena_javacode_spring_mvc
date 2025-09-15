@@ -22,5 +22,6 @@ public interface BookMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = IGNORE)
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "author", ignore = true)
     void updateEntity(BookDto source, @MappingTarget BookEntity target);
 }

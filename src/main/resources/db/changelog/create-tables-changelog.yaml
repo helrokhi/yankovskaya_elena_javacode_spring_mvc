@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - include:
+      file: 001-create-authors.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: 002-create-books.yaml
+      relativeToChangelogFile: true
+
