@@ -5,14 +5,14 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public enum Genre {
     FANTASY("Фэнтези"),
-    SCIENCE_FICTION("Научная фантастика"),
-    MYSTERY("Детектив"),
-    THRILLER("Триллер"),
+    DRAMA("Драма"),
+    DETECTIVE("Детектив"),
+    NOVEL("Новелла"),
     ROMANCE("Роман"),
-    HORROR("Ужасы"),
-    BIOGRAPHY("Биография"),
-    HISTORY("История"),
-    POETRY("Поэзия"),
-    CHILDREN("Детская литература");
+    ADVENTURE("Приключения"),
+    DYSTOPIA("Антиутопия"),
+    HISTORICAL("История"),
+    SATIRE("Сатира"),
+    PHILOSOPHY("Философия");
     private final String displayName;
 }
