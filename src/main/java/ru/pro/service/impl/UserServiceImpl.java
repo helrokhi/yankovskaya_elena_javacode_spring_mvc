@@ -2,6 +2,9 @@ package ru.pro.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.pro.mapper.OrderMapper;
@@ -9,6 +12,7 @@ import ru.pro.mapper.UserMapper;
 import ru.pro.model.dto.UserDto;
 import ru.pro.model.entity.OrderEntity;
 import ru.pro.model.entity.UserEntity;
+import ru.pro.model.response.PagedResponse;
 import ru.pro.repository.OrderRepository;
 import ru.pro.repository.UserRepository;
 import ru.pro.service.UserService;
@@ -18,6 +22,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
@@ -26,8 +31,16 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
 
     @Override
-    public List<UserDto> findAll() {
-        return userMapper.toDtoList(userRepository.findAll());
+    public PagedResponse<UserDto> findAll(Pageable pageable) {
+        Page<UserDto> page = userRepository.findAll(pageable).map(userMapper::toDto);
+        log.info("Fetched users: {}", page.getContent());
+        return new PagedResponse<>(
+                page.getContent(),
+                page.getTotalElements(),
+                page.getTotalPages(),
+                page.getNumber(),
+                page.getSize()
+        );
     }
 
     @Override

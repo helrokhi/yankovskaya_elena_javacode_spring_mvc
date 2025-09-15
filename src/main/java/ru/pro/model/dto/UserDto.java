@@ -7,10 +7,10 @@ import ru.pro.views.Views;
 import java.util.List;
 import java.util.UUID;
 
+@JsonView(Views.UserSummary.class)
 public record UserDto(
-        @JsonView(Views.UserSummary.class) UUID id,
-        @JsonView(Views.UserSummary.class) String name,
-        @Email
-        @JsonView(Views.UserSummary.class) String email,
+        UUID id,
+        String name,
+        @Email String email,
         @JsonView(Views.UserDetails.class) List<OrderDto> orders) {
 }

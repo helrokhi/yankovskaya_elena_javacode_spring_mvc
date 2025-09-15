@@ -7,12 +7,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import ru.pro.mapper.OrderMapper;
 import ru.pro.mapper.UserMapper;
 import ru.pro.model.dto.OrderDto;
 import ru.pro.model.dto.UserDto;
 import ru.pro.model.entity.OrderEntity;
 import ru.pro.model.entity.UserEntity;
+import ru.pro.model.response.PagedResponse;
 import ru.pro.repository.OrderRepository;
 import ru.pro.repository.UserRepository;
 import ru.pro.service.impl.UserServiceImpl;
@@ -50,7 +56,6 @@ class UserServiceTest {
     private UserServiceImpl userService;
 
     private UUID userId;
-    private UUID orderId;
     private UserEntity userEntity;
     private UserDto userDto;
     private OrderEntity orderEntity;
@@ -60,7 +65,7 @@ class UserServiceTest {
     @BeforeEach
     void setUp() {
         userId = UUID.randomUUID();
-        orderId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
 
         userEntity = new UserEntity(userId, "John", "john@example.com");
         orderEntity = new OrderEntity(orderId, userEntity, "laptop", 1, BigDecimal.valueOf(89.99), NEW);
@@ -72,14 +77,23 @@ class UserServiceTest {
 
     @Test
     void findAll_shouldReturnListOfUsers() {
-        when(userRepository.findAll()).thenReturn(List.of(userEntity));
-        when(userMapper.toDtoList(List.of(userEntity))).thenReturn(List.of(userDto));
-        when(userService.findAll()).thenReturn(List.of(userDto));
+        Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.ASC, "name"));
+        Page<UserEntity> entityPage = new PageImpl<>(List.of(userEntity), pageable, 1);
 
-        List<UserDto> result = userService.findAll();
+        when(userRepository.findAll(pageable)).thenReturn(entityPage);
+        when(userMapper.toDto(userEntity)).thenReturn(userDto);
 
-        assertEquals(1, result.size());
-        assertEquals("John", result.get(0).name());
+        PagedResponse<UserDto> result = userService.findAll(pageable);
+
+        assertEquals(1, result.totalElements());
+        assertEquals(1, result.content().size());
+        assertEquals("John", result.content().getFirst().name());
+        assertEquals(5, result.size());
+        assertEquals(0, result.number());
+        assertEquals(1, result.totalPages());
+
+        Sort sort = pageable.getSort();
+        assertEquals(Sort.by(Sort.Direction.ASC, "name"), sort);
     }
 
     @Test

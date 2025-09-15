@@ -1,14 +1,15 @@
 package ru.pro.api;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import ru.pro.model.dto.UserDto;
+import ru.pro.model.response.PagedResponse;
 import ru.pro.views.Views;
 
-import java.util.List;
 import java.util.UUID;
 
 import static org.springframework.http.HttpStatus.NOT_IMPLEMENTED;
@@ -23,8 +24,7 @@ public interface UserApi {
             value = "/users",
             method = GET,
             produces = "application/json")
-    @JsonView(Views.UserSummary.class)
-    default ResponseEntity<List<UserDto>> getAll() {
+    default ResponseEntity<PagedResponse<UserDto>> getAll(Pageable pageable) {
         return new ResponseEntity<>(NOT_IMPLEMENTED);
     }
 

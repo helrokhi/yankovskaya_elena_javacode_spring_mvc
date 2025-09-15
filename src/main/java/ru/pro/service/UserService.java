@@ -1,12 +1,13 @@
 package ru.pro.service;
 
+import org.springframework.data.domain.Pageable;
 import ru.pro.model.dto.UserDto;
+import ru.pro.model.response.PagedResponse;
 
-import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
-    List<UserDto> findAll();
+    PagedResponse<UserDto> findAll(Pageable pageable);
 
     UserDto findById(UUID id);
 

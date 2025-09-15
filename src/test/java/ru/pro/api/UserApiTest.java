@@ -9,11 +9,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.pro.api.controller.UserController;
 import ru.pro.model.dto.OrderDto;
 import ru.pro.model.dto.UserDto;
 import ru.pro.model.enums.OrderStatus;
+import ru.pro.model.response.PagedResponse;
 import ru.pro.service.UserService;
 
 import java.math.BigDecimal;
@@ -59,12 +61,31 @@ class UserApiTest {
     void testGetAllUsers() throws Exception {
         UserDto user = new UserDto(UUID.randomUUID(), "Alice", "alice@example.com", List.of());
 
-        when(userService.findAll()).thenReturn(List.of(user));
+        PagedResponse<UserDto> pagedResponse = new PagedResponse<>(
+                List.of(user),
+                1,
+                1,
+                0,
+                5
+        );
+
+        when(userService.findAll(any(Pageable.class)))
+                .thenReturn(pagedResponse);
 
         mockMvc.perform(get("/api/v1/users")
                         .accept(APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(APPLICATION_JSON));
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(jsonPath("$.content[0].id").value(user.id().toString()))
+                .andExpect(jsonPath("$.content[0].name").value("Alice"))
+                .andExpect(jsonPath("$.content[0].email").value("alice@example.com"))
+
+                .andExpect(jsonPath("$.content[0].orders").doesNotExist())
+
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.totalPages").value(1))
+                .andExpect(jsonPath("$.number").value(0))
+                .andExpect(jsonPath("$.size").value(5));
     }
 
     @Test
@@ -146,18 +167,31 @@ class UserApiTest {
                 List.of(new OrderDto(UUID.randomUUID(), "Order1", 2, BigDecimal.TEN, OrderStatus.NEW))
         );
 
-        when(userService.findAll()).thenReturn(List.of(user));
+        PagedResponse<UserDto> pagedResponse = new PagedResponse<>(
+                List.of(user),   // content
+                1,               // totalElements
+                1,               // totalPages
+                0,               // number (page)
+                5                // size
+        );
+
+        when(userService.findAll(any(Pageable.class)))
+                .thenReturn(pagedResponse);
 
         mockMvc.perform(get("/api/v1/users")
                         .accept(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON))
-                // должны быть только id, name, email
-                .andExpect(jsonPath("$[0].id").value(user.id().toString()))
-                .andExpect(jsonPath("$[0].name").value("Alice"))
-                .andExpect(jsonPath("$[0].email").value("alice@example.com"))
+                .andExpect(jsonPath("$.content[0].id").value(user.id().toString()))
+                .andExpect(jsonPath("$.content[0].name").value("Alice"))
+                .andExpect(jsonPath("$.content[0].email").value("alice@example.com"))
                 // orders НЕ должен сериализоваться в UserSummary
-                .andExpect(jsonPath("$[0].orders").doesNotExist());
+                .andExpect(jsonPath("$.content[0].orders").doesNotExist())
+                // дополнительные проверки страницы
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.totalPages").value(1))
+                .andExpect(jsonPath("$.number").value(0))
+                .andExpect(jsonPath("$.size").value(5));
     }
 
     @Test
