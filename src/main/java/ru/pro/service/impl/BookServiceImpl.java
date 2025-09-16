@@ -1,8 +1,10 @@
 package ru.pro.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -24,7 +26,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public Page<BookDto> findAll(Pageable pageable) {
         Page<BookDto> page = bookRepository.findAll(pageable).map(bookMapper::toDto);
-        log.info("Fetched users: {}", page.getContent());
+        log.info("Fetched books: {}", page.getContent());
         return page;
     }
 
@@ -36,6 +38,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @Transactional
     public BookDto create(BookDto dto) {
         BookEntity entity = bookMapper.toEntity(dto);
         BookEntity saved = bookRepository.save(entity);
@@ -43,19 +46,22 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @Transactional
     public BookDto update(UUID id, BookDto source) {
         BookEntity target = bookRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User not found: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Book not found: " + id));
         bookMapper.updateEntity(source, target);
         BookEntity saved = bookRepository.save(target);
         return bookMapper.toDto(saved);
     }
 
     @Override
+    @Transactional
     public void delete(UUID id) {
-        if (!bookRepository.existsById(id)) {
+        try {
+            bookRepository.deleteById(id);
+        } catch (EmptyResultDataAccessException e) {
             throw new EntityNotFoundException("Book not found: " + id);
         }
-        bookRepository.deleteById(id);
     }
 }
