@@ -25,16 +25,17 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Page<BookDto> findAll(Pageable pageable) {
-        Page<BookDto> page = bookRepository.findAll(pageable).map(bookMapper::toDto);
+        Page<BookDto> page = bookRepository.findAll(pageable)
+                .map(bookMapper::toDto);
         log.info("Fetched books: {}", page.getContent());
         return page;
     }
 
     @Override
     public BookDto findById(UUID id) {
-        BookEntity user = bookRepository.findById(id)
+        BookEntity book = bookRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Book not found: " + id));
-        return bookMapper.toDto(user);
+        return bookMapper.toDto(book);
     }
 
     @Override
