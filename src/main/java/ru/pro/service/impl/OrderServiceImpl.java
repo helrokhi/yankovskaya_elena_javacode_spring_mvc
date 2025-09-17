@@ -40,7 +40,7 @@ public class OrderServiceImpl implements OrderService {
     public OrderDto create(OrderDto dto) {
         UUID customerId = UUID.fromString(dto.customerId());
         Set<OrderItemDto> itemsDto = dto.items();
-        if (customerRepository.existsById(customerId)) {
+        if (!customerRepository.existsById(customerId)) {
             throw new EntityNotFoundException("Customer not found with id: " + customerId);
         }
 

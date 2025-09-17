@@ -6,21 +6,19 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
 public record OrderItemDto(
-        @NotNull(message = "OrderItem id is mandatory")
-        @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
-                message = "ID must be a valid UUID format")
         String id,
-        @NotNull(message = "OrderId is mandatory")
-        @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
-                message = "ID must be a valid UUID format")
         String orderId,
-        @NotNull(message = "ProductId is mandatory")
+
+        @NotBlank(message = "Id cannot be blank")
         @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
                 message = "ID must be a valid UUID format")
         String productId,
+
         @NotNull(message = "Quantity is mandatory")
         @Min(value = 1, message = "Quantity must be >= 1")
         Integer quantity,
-        @NotBlank(message = "Price is mandatory")
+
+        @NotBlank(message = "Price cannot be blank")
+        @Pattern(regexp = "\\d+(\\.\\d{1,2})?", message = "Price must be a number with max two decimal places")
         String price) {
 }

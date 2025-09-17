@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -75,6 +76,18 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleEntityNotFound(EntityNotFoundException ex) {
         return handleWalletError(NOT_FOUND, "ENTITY_NOT_FOUND", ex.getMessage(), ex);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException ex) {
+        return handleWalletError(BAD_REQUEST, "INVALID_ARGUMENT", ex.getMessage(), ex);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidJson(HttpMessageNotReadableException ex) {
+        Throwable rootCause = ex.getMostSpecificCause();
+        String message = rootCause.getMessage();
+        return handleWalletError(BAD_REQUEST, "INVALID_JSON", message, ex);
     }
 
     @ExceptionHandler(Exception.class)

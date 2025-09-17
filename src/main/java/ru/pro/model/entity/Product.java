@@ -33,12 +33,10 @@ public class Product {
 
     private String description;
 
-    @NotBlank
     @Column(nullable = false)
     @Min(0)
     private BigDecimal price;
 
-    @NotBlank
     @Column(nullable = false)
     @Min(0)
     private Integer quantityStock;
