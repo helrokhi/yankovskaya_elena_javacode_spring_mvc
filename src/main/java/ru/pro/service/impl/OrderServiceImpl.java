@@ -38,7 +38,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public OrderDto create(OrderDto dto) {
-        UUID customerId = dto.customerId();
+        UUID customerId = UUID.fromString(dto.customerId());
         Set<OrderItemDto> itemsDto = dto.items();
         if (customerRepository.existsById(customerId)) {
             throw new EntityNotFoundException("Customer not found with id: " + customerId);
@@ -47,7 +47,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderMapper.toEntity(dto);
 
         for (OrderItemDto item : itemsDto) {
-            Product product = productRepository.findById(item.productId())
+            Product product = productRepository.findById(UUID.fromString(item.productId()))
                     .orElseThrow(() -> new EntityNotFoundException("Product not found with id: " + item.productId()));
 
             if (product.getQuantityStock() < item.quantity()) {
