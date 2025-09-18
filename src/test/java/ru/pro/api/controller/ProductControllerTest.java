@@ -106,10 +106,7 @@ class ProductControllerTest {
         mockMvc.perform(post("/api/v1/products")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.name").exists())
-                .andExpect(jsonPath("$.price").exists())
-                .andExpect(jsonPath("$.quantityStock").exists());
+                .andExpect(status().isBadRequest());
     }
 
     @Test

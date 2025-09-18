@@ -3,7 +3,6 @@ package ru.pro.service.impl;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.pro.mapper.ProductMapper;
 import ru.pro.model.dto.ProductDto;
@@ -55,10 +54,9 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public void deleteById(UUID id) {
-        try {
-            productRepository.deleteById(id);
-        } catch (EmptyResultDataAccessException e) {
+        if (!productRepository.existsById(id)) {
             throw new EntityNotFoundException("Product not found" + id);
         }
+        productRepository.deleteById(id);
     }
 }
