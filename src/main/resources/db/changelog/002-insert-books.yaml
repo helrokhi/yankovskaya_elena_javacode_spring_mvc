@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: 004
+      id: 002
       author: Elena_Yankovskaya
       changes:
         # J.K. Rowling
@@ -9,12 +9,16 @@ databaseChangeLog:
             columns:
               - column: { name: id, value: "11111111-aaaa-aaaa-aaaa-000000000001" }
               - column: { name: title, value: "Harry Potter and the Philosopher's Stone" }
+              - column: { name: author, value: "J.K. Rowling" }
+              - column: { name: publication_year, valueNumeric: 1997 }
 
         - insert:
             tableName: books
             columns:
               - column: { name: id, value: "11111111-aaaa-aaaa-aaaa-000000000002" }
               - column: { name: title, value: "Harry Potter and the Chamber of Secrets" }
+              - column: { name: author, value: "J.K. Rowling" }
+              - column: { name: publication_year, valueNumeric: 1998 }
 
         # George Orwell
         - insert:
@@ -22,12 +26,16 @@ databaseChangeLog:
             columns:
               - column: { name: id, value: "22222222-bbbb-bbbb-bbbb-000000000001" }
               - column: { name: title, value: "1984" }
+              - column: { name: author, value: "George Orwell" }
+              - column: { name: publication_year, valueNumeric: 1949 }
 
         - insert:
             tableName: books
             columns:
               - column: { name: id, value: "22222222-bbbb-bbbb-bbbb-000000000002" }
               - column: { name: title, value: "Animal Farm" }
+              - column: { name: author, value: "George Orwell" }
+              - column: { name: publication_year, valueNumeric: 1945 }
 
         # Agatha Christie
         - insert:
@@ -35,12 +43,16 @@ databaseChangeLog:
             columns:
               - column: { name: id, value: "33333333-cccc-cccc-cccc-000000000001" }
               - column: { name: title, value: "Murder on the Orient Express" }
+              - column: { name: author, value: "Agatha Christie" }
+              - column: { name: publication_year, valueNumeric: 1934 }
 
         - insert:
             tableName: books
             columns:
               - column: { name: id, value: "33333333-cccc-cccc-cccc-000000000002" }
               - column: { name: title, value: "And Then There Were None" }
+              - column: { name: author, value: "Agatha Christie" }
+              - column: { name: publication_year, valueNumeric: 1939 }
 
         # Leo Tolstoy
         - insert:
@@ -48,12 +60,16 @@ databaseChangeLog:
             columns:
               - column: { name: id, value: "44444444-dddd-dddd-dddd-000000000001" }
               - column: { name: title, value: "War and Peace" }
+              - column: { name: author, value: "Leo Tolstoy" }
+              - column: { name: publication_year, valueNumeric: 1869 }
 
         - insert:
             tableName: books
             columns:
               - column: { name: id, value: "44444444-dddd-dddd-dddd-000000000002" }
               - column: { name: title, value: "Anna Karenina" }
+              - column: { name: author, value: "Leo Tolstoy" }
+              - column: { name: publication_year, valueNumeric: 1877 }
 
         # Mark Twain
         - insert:
@@ -61,12 +77,16 @@ databaseChangeLog:
             columns:
               - column: { name: id, value: "55555555-eeee-eeee-eeee-000000000001" }
               - column: { name: title, value: "The Adventures of Tom Sawyer" }
+              - column: { name: author, value: "Mark Twain" }
+              - column: { name: publication_year, valueNumeric: 1876 }
 
         - insert:
             tableName: books
             columns:
               - column: { name: id, value: "55555555-eeee-eeee-eeee-000000000002" }
               - column: { name: title, value: "Adventures of Huckleberry Finn" }
+              - column: { name: author, value: "Mark Twain" }
+              - column: { name: publication_year, valueNumeric: 1884 }
 
         # Ernest Hemingway
         - insert:
@@ -74,12 +94,16 @@ databaseChangeLog:
             columns:
               - column: { name: id, value: "66666666-ffff-ffff-ffff-000000000001" }
               - column: { name: title, value: "The Old Man and the Sea" }
+              - column: { name: author, value: "Ernest Hemingway" }
+              - column: { name: publication_year, valueNumeric: 1952 }
 
         - insert:
             tableName: books
             columns:
               - column: { name: id, value: "66666666-ffff-ffff-ffff-000000000002" }
               - column: { name: title, value: "For Whom the Bell Tolls" }
+              - column: { name: author, value: "Ernest Hemingway" }
+              - column: { name: publication_year, valueNumeric: 1940 }
 
         # Fyodor Dostoevsky
         - insert:
@@ -87,12 +111,16 @@ databaseChangeLog:
             columns:
               - column: { name: id, value: "77777777-aaaa-aaaa-aaaa-000000000001" }
               - column: { name: title, value: "Crime and Punishment" }
+              - column: { name: author, value: "Fyodor Dostoevsky" }
+              - column: { name: publication_year, valueNumeric: 1866 }
 
         - insert:
             tableName: books
             columns:
               - column: { name: id, value: "77777777-aaaa-aaaa-aaaa-000000000002" }
               - column: { name: title, value: "The Brothers Karamazov" }
+              - column: { name: author, value: "Fyodor Dostoevsky" }
+              - column: { name: publication_year, valueNumeric: 1880 }
 
         # Jane Austen
         - insert:
@@ -100,12 +128,16 @@ databaseChangeLog:
             columns:
               - column: { name: id, value: "88888888-bbbb-bbbb-bbbb-000000000001" }
               - column: { name: title, value: "Pride and Prejudice" }
+              - column: { name: author, value: "Jane Austen" }
+              - column: { name: publication_year, valueNumeric: 1813 }
 
         - insert:
             tableName: books
             columns:
               - column: { name: id, value: "88888888-bbbb-bbbb-bbbb-000000000002" }
               - column: { name: title, value: "Sense and Sensibility" }
+              - column: { name: author, value: "Jane Austen" }
+              - column: { name: publication_year, valueNumeric: 1811 }
 
         # Charles Dickens
         - insert:
@@ -113,11 +145,16 @@ databaseChangeLog:
             columns:
               - column: { name: id, value: "99999999-cccc-cccc-cccc-000000000001" }
               - column: { name: title, value: "Oliver Twist" }
+              - column: { name: author, value: "Charles Dickens" }
+              - column: { name: publication_year, valueNumeric: 1838 }
+
         - insert:
             tableName: books
             columns:
               - column: { name: id, value: "99999999-cccc-cccc-cccc-000000000002" }
               - column: { name: title, value: "A Tale of Two Cities" }
+              - column: { name: author, value: "Charles Dickens" }
+              - column: { name: publication_year, valueNumeric: 1859 }
 
         # J.R.R. Tolkien
         - insert:
@@ -125,8 +162,13 @@ databaseChangeLog:
             columns:
               - column: { name: id, value: "10101010-dddd-dddd-dddd-000000000001" }
               - column: { name: title, value: "The Hobbit" }
+              - column: { name: author, value: "J.R.R. Tolkien" }
+              - column: { name: publication_year, valueNumeric: 1937 }
+
         - insert:
             tableName: books
             columns:
               - column: { name: id, value: "10101010-dddd-dddd-dddd-000000000002" }
               - column: { name: title, value: "The Lord of the Rings: The Fellowship of the Ring" }
+              - column: { name: author, value: "J.R.R. Tolkien" }
+              - column: { name: publication_year, valueNumeric: 1954 }

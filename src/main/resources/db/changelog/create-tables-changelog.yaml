@@ -1,12 +1,4 @@
 databaseChangeLog:
   - include:
-      file: 001-create-authors.yaml
-      relativeToChangelogFile: true
-
-  - include:
-      file: 002-create-books.yaml
-      relativeToChangelogFile: true
-
-  - include:
-      file: 005_create_books_authors.yaml
+      file: 001-create-books.yaml
       relativeToChangelogFile: true

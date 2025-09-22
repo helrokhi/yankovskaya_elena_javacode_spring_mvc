@@ -4,7 +4,7 @@ databaseChangeLog:
       author: Elena_Yankovskaya
       changes:
         - createTable:
-            tableName: authors
+            tableName: books
             columns:
               - column:
                   name: id
@@ -13,12 +13,17 @@ databaseChangeLog:
                     primaryKey: true
                     nullable: false
               - column:
-                  name: first_name
-                  type: VARCHAR(100)
+                  name: title
+                  type: VARCHAR(255)
                   constraints:
                     nullable: false
               - column:
-                  name: last_name
-                  type: VARCHAR(100)
+                  name: author
+                  type: VARCHAR(255)
                   constraints:
                     nullable: false
+              - column:
+                  name: publication_year
+                  type: INT
+                  constraints:
+                    nullable: true

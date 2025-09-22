@@ -1,19 +1,17 @@
 package ru.pro.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.pro.mapper.BookMapper;
 import ru.pro.model.dto.BookDto;
-import ru.pro.model.entity.BookEntity;
+import ru.pro.model.entity.Book;
 import ru.pro.repository.BookRepository;
 import ru.pro.service.BookService;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -24,43 +22,52 @@ public class BookServiceImpl implements BookService {
     private final BookMapper bookMapper;
 
     @Override
-    public Page<BookDto> findAll(Pageable pageable) {
-        Page<BookDto> page = bookRepository.findAll(pageable)
-                .map(bookMapper::toDto);
-        log.info("Fetched books: {}", page.getContent());
-        return page;
+    public List<BookDto> findAll() {
+        List<Book> books = bookRepository.findAll();
+        List<BookDto> result = books.stream()
+                .map(bookMapper::toDto)
+                .toList();
+        log.info("Fetched {} books", result.size());
+        return result;
     }
 
     @Override
     public BookDto findById(UUID id) {
-        BookEntity book = bookRepository.findById(id)
+        Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Book not found: " + id));
         return bookMapper.toDto(book);
     }
 
     @Override
-    @Transactional
     public BookDto create(BookDto dto) {
-        BookEntity entity = bookMapper.toEntity(dto);
-        BookEntity saved = bookRepository.save(entity);
-        return bookMapper.toDto(saved);
+        Book entity = bookMapper.toEntity(dto);
+
+        if (entity.getId() == null) {
+            entity.setId(UUID.randomUUID());
+        }
+
+        bookRepository.insert(entity);
+        log.info("Created book: {}", entity);
+        return bookMapper.toDto(entity);
     }
 
     @Override
-    @Transactional
     public BookDto update(UUID id, BookDto source) {
-        BookEntity target = bookRepository.findById(id)
+        Book target = bookRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Book not found: " + id));
+
         bookMapper.updateEntity(source, target);
-        BookEntity saved = bookRepository.save(target);
-        return bookMapper.toDto(saved);
+
+        bookRepository.update(target);
+        log.info("Updated book with id={}", id);
+        return bookMapper.toDto(target);
     }
 
     @Override
-    @Transactional
     public void delete(UUID id) {
         try {
-            bookRepository.deleteById(id);
+            bookRepository.delete(id);
+            log.info("Deleted book with id={}", id);
         } catch (EmptyResultDataAccessException e) {
             throw new EntityNotFoundException("Book not found: " + id);
         }

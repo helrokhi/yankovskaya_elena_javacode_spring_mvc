@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.pro.exception.ApiException;
 import ru.pro.exception.BadRequestInvalidRequestFormatException;
-import ru.pro.exception.answers.ErrorResponse;
+import ru.pro.exception.wrappers.ErrorResponse;
 
 import java.sql.Timestamp;
 import java.time.Instant;

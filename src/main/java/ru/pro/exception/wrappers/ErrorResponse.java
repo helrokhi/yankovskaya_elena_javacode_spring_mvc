@@ -1,4 +1,4 @@
-package ru.pro.exception.answers;
+package ru.pro.exception.wrappers;
 
 import java.sql.Timestamp;
 import java.util.Map;

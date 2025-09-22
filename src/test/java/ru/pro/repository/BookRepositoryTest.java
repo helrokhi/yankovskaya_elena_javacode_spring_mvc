@@ -1,138 +1,130 @@
 package ru.pro.repository;
 
-import jakarta.persistence.EntityManager;
-import jakarta.validation.ConstraintViolationException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import ru.pro.model.entity.AuthorEntity;
-import ru.pro.model.entity.BookEntity;
+import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.dao.EmptyResultDataAccessException;
+import ru.pro.model.entity.Book;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@DataJpaTest
+@JdbcTest
+@Import(BookRepository.class)
 class BookRepositoryTest {
     @Autowired
     private BookRepository bookRepository;
 
-    @Autowired
-    private AuthorRepository authorRepository;
+    private Book book;
 
-    @Autowired
-    private EntityManager entityManager;
-
-    @Test
-    @DisplayName("findById возвращает книгу по ID")
-    void testFindById() {
-        BookEntity entity = bookRepository.findAll().stream()
-                .filter(b -> b.getTitle().equals("1984"))
-                .findFirst()
-                .orElseThrow();
-
-        Optional<BookEntity> found = bookRepository.findById(entity.getId());
-        assertThat(found).isPresent();
-        assertThat(found.get().getTitle()).isEqualTo("1984");
+    @BeforeEach
+    void setUp() {
+        book = new Book(UUID.randomUUID(), "Test Book", "Test Author", 2025);
+        bookRepository.insert(book);
     }
 
-    @Test
-    @DisplayName("findById для несуществующего UUID возвращает пустой Optional")
-    void testFindByIdNotFound() {
-        Optional<BookEntity> found = bookRepository.findById(UUID.randomUUID());
-        assertThat(found).isEmpty();
+    @Nested
+    @DisplayName("findAll()")
+    class FindAll {
+        @Test
+        @DisplayName("возвращает список всех книг")
+        void testFindAll() {
+            List<Book> books = bookRepository.findAll();
+            assertThat(books).isNotEmpty();
+            assertThat(books).extracting(Book::getTitle).contains("Test Book");
+        }
     }
 
-    @Test
-    @DisplayName("save сохраняет новую книгу")
-    void testSave() {
-        BookEntity newBook = new BookEntity(null, "Charlie", Set.of());
-        BookEntity saved = bookRepository.save(newBook);
+    @Nested
+    @DisplayName("findById()")
+    class FindById {
+        @Test
+        @DisplayName("возвращает книгу по существующему ID")
+        void testFindByIdFound() {
+            Optional<Book> found = bookRepository.findById(book.getId());
+            assertThat(found).isPresent();
+            assertThat(found.get().getTitle()).isEqualTo("Test Book");
+        }
 
-        assertThat(saved.getId()).isNotNull();
-        assertThat(bookRepository.findById(saved.getId())).isPresent();
+        @Test
+        @DisplayName("возвращает пустой Optional для несуществующего ID")
+        void testFindByIdNotFound() {
+            Optional<Book> found = bookRepository.findById(UUID.randomUUID());
+            assertThat(found).isEmpty();
+        }
     }
 
-    @Test
-    @DisplayName("deleteById удаляет книгу")
-    void testDeleteById() {
-        BookEntity book = bookRepository.findAll().stream()
-                .filter(b -> b.getTitle().equals("Animal Farm"))
-                .findFirst()
-                .orElseThrow();
+    @Nested
+    @DisplayName("insert()")
+    class Insert {
+        @Test
+        @DisplayName("сохраняет новую книгу")
+        void testInsert() {
+            Book newBook = new Book(UUID.randomUUID(), "Another Book", "Another Author", 2023);
+            bookRepository.insert(newBook);
 
-        bookRepository.deleteById(book.getId());
-        assertThat(bookRepository.findById(book.getId())).isEmpty();
+            Optional<Book> found = bookRepository.findById(newBook.getId());
+            assertThat(found).isPresent();
+            assertThat(found.get().getTitle()).isEqualTo("Another Book");
+        }
     }
 
-    @Test
-    @DisplayName("saveAndFlush выбрасывает исключение при null title")
-    void testSaveBookWithNullTitleThrowsException() {
-        BookEntity book = new BookEntity(null, null, Set.of());
+    @Nested
+    @DisplayName("update()")
+    class Update {
+        @Test
+        @DisplayName("обновляет существующую книгу")
+        void testUpdate() {
+            book.setTitle("Updated Book");
+            book.setAuthor("Updated Author");
+            bookRepository.update(book);
 
-        assertThatThrownBy(() -> bookRepository.saveAndFlush(book))
-                .isInstanceOf(ConstraintViolationException.class);
+            Book updated = bookRepository.findById(book.getId()).orElseThrow();
+            assertThat(updated.getTitle()).isEqualTo("Updated Book");
+            assertThat(updated.getAuthor()).isEqualTo("Updated Author");
+        }
     }
 
-    @Test
-    @DisplayName("saveAndFlush выбрасывает исключение при пустом title")
-    void testSaveBookWithBlankTitleThrowsException() {
-        BookEntity book = new BookEntity(null, "   ", Set.of());
+    @Nested
+    @DisplayName("delete()")
+    class Delete {
+        @Test
+        @DisplayName("удаляет существующую книгу")
+        void testDelete() {
+            bookRepository.delete(book.getId());
+            assertThat(bookRepository.findById(book.getId())).isEmpty();
+        }
 
-        assertThatThrownBy(() -> bookRepository.saveAndFlush(book))
-                .isInstanceOf(ConstraintViolationException.class);
+        @Test
+        @DisplayName("выбрасывает исключение при удалении несуществующей книги")
+        void testDeleteNotFound() {
+            UUID randomId = UUID.randomUUID();
+            assertThatThrownBy(() -> bookRepository.delete(randomId))
+                    .isInstanceOf(EmptyResultDataAccessException.class);
+        }
     }
 
-    @Test
-    @DisplayName("findAll с pageable возвращает корректную страницу")
-    void testFindAllWithPageable() {
-        Page<BookEntity> page = bookRepository.findAll(PageRequest.of(0, 5));
-        assertThat(page).isNotNull();
-        assertThat(page.getContent()).hasSize(5);
-        assertThat(page.getTotalElements()).isGreaterThanOrEqualTo(10);
-    }
+    @Nested
+    @DisplayName("existsById()")
+    class ExistsById {
+        @Test
+        @DisplayName("возвращает true для существующей книги")
+        void testExistsByIdTrue() {
+            assertThat(bookRepository.existsById(book.getId())).isTrue();
+        }
 
-    @Test
-    @DisplayName("сохраняется связь книга ↔ авторы")
-    void testSaveBookWithAuthors() {
-        AuthorEntity author = new AuthorEntity(null, "Mark", "Twain", Set.of());
-        authorRepository.save(author);
-
-        BookEntity book = new BookEntity(null, "Tom Sawyer", Set.of(author));
-        BookEntity saved = bookRepository.save(book);
-
-        entityManager.flush();
-        entityManager.clear();
-
-        BookEntity reloaded = bookRepository.findById(saved.getId()).orElseThrow();
-        assertThat(reloaded.getAuthors()).hasSize(1);
-        assertThat(reloaded.getAuthors().iterator().next().getLastName()).isEqualTo("Twain");
-    }
-
-    @Test
-    @DisplayName("удаление всех записей")
-    void testDeleteAll() {
-        bookRepository.deleteAll();
-        assertThat(bookRepository.findAll()).isEmpty();
-    }
-
-    @Test
-    @DisplayName("save сохраняет несколько книг")
-    void testSaveMultipleBooks() {
-        BookEntity book1 = new BookEntity(null, "Book1", Set.of());
-        BookEntity book2 = new BookEntity(null, "Book2", Set.of());
-
-        bookRepository.saveAll(List.of(book1, book2));
-
-        assertThat(bookRepository.findAll())
-                .extracting(BookEntity::getTitle)
-                .contains("Book1", "Book2");
+        @Test
+        @DisplayName("возвращает false для несуществующей книги")
+        void testExistsByIdFalse() {
+            assertThat(bookRepository.existsById(UUID.randomUUID())).isFalse();
+        }
     }
 }

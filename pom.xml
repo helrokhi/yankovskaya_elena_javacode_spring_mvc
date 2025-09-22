@@ -12,7 +12,7 @@
     </parent>
 
     <groupId>ru.pro</groupId>
-    <artifactId>spring_mvc_library</artifactId>
+    <artifactId>spring_data_library</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
@@ -28,7 +28,7 @@
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
         </dependency>
 
         <dependency>
@@ -71,6 +71,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.persistence</groupId>
+            <artifactId>jakarta.persistence-api</artifactId>
         </dependency>
 
     </dependencies>

@@ -2,10 +2,6 @@ package ru.pro.api.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,6 +10,7 @@ import ru.pro.api.BookApi;
 import ru.pro.model.dto.BookDto;
 import ru.pro.service.BookService;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -23,11 +20,9 @@ public class BookController implements BookApi {
     private final BookService bookService;
 
     @Override
-    public ResponseEntity<Page<BookDto>> getAll(
-            @PageableDefault(size = 5, sort = "title", direction = Sort.Direction.ASC) //default page = 0
-            Pageable pageable) {
-        log.info("Page content: {}", bookService.findAll(pageable));
-        return ResponseEntity.ok(bookService.findAll(pageable));
+    public ResponseEntity<List<BookDto>> getAll() {
+        log.info("Page content: {}", bookService.findAll());
+        return ResponseEntity.ok(bookService.findAll());
     }
 
     @Override

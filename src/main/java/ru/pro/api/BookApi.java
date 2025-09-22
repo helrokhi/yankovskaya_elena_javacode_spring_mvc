@@ -1,13 +1,12 @@
 package ru.pro.api;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import ru.pro.model.dto.BookDto;
 
+import java.util.List;
 import java.util.UUID;
 
 import static org.springframework.http.HttpStatus.NOT_IMPLEMENTED;
@@ -22,7 +21,7 @@ public interface BookApi {
             value = "/books",
             method = GET,
             produces = "application/json")
-    default ResponseEntity<Page<BookDto>> getAll(Pageable pageable) {
+    default ResponseEntity<List<BookDto>> getAll() {
         return new ResponseEntity<>(NOT_IMPLEMENTED);
     }
 

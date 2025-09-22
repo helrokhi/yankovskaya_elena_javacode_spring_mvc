@@ -8,24 +8,21 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import ru.pro.mapper.BookMapper;
 import ru.pro.model.dto.BookDto;
-import ru.pro.model.entity.BookEntity;
+import ru.pro.model.entity.Book;
 import ru.pro.repository.BookRepository;
 import ru.pro.service.impl.BookServiceImpl;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
@@ -41,45 +38,46 @@ class BookServiceTest {
     @InjectMocks
     private BookServiceImpl bookService;
 
-    private BookEntity bookEntity;
+    private Book book;
     private BookDto bookDto;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        bookEntity = new BookEntity();
-        bookEntity.setId(UUID.randomUUID());
-        bookEntity.setTitle("Test Book");
+        book = new Book();
+        book.setId(UUID.randomUUID());
+        book.setTitle("Test Book");
+        book.setAuthor("Test Author");
+        book.setPublicationYear(2025);
 
-        bookDto = new BookDto(bookEntity.getId(), "Test Book", Set.of());
+        bookDto = new BookDto(book.getId(), book.getTitle(), book.getAuthor(),  book.getPublicationYear());
     }
 
     @Test
-    @DisplayName("findAll() — возвращает страницу DTO")
+    @DisplayName("findAll() — возвращает список DTO")
     void testFindAll() {
-        PageRequest pageable = PageRequest.of(0, 10);
-        given(bookRepository.findAll(pageable)).willReturn(new PageImpl<>(List.of(bookEntity)));
-        given(bookMapper.toDto(bookEntity)).willReturn(bookDto);
+        given(bookRepository.findAll()).willReturn(List.of(book));
+        given(bookMapper.toDto(book)).willReturn(bookDto);
 
-        Page<BookDto> result = bookService.findAll(pageable);
+        List<BookDto> result = bookService.findAll();
 
-        assertThat(result.getContent()).containsExactly(bookDto);
-        verify(bookRepository).findAll(pageable);
-        verify(bookMapper).toDto(bookEntity);
+        assertThat(result).containsExactly(bookDto);
+        verify(bookRepository).findAll();
+        verify(bookMapper).toDto(book);
     }
 
     @Test
     @DisplayName("findById() — успешный поиск")
     void testFindByIdFound() {
-        given(bookRepository.findById(bookEntity.getId())).willReturn(Optional.of(bookEntity));
-        given(bookMapper.toDto(bookEntity)).willReturn(bookDto);
+        given(bookRepository.findById(book.getId())).willReturn(Optional.of(book));
+        given(bookMapper.toDto(book)).willReturn(bookDto);
 
-        BookDto result = bookService.findById(bookEntity.getId());
+        BookDto result = bookService.findById(book.getId());
 
         assertThat(result).isEqualTo(bookDto);
-        verify(bookRepository).findById(bookEntity.getId());
-        verify(bookMapper).toDto(bookEntity);
+        verify(bookRepository).findById(book.getId());
+        verify(bookMapper).toDto(book);
     }
 
     @Test
@@ -99,35 +97,39 @@ class BookServiceTest {
     @Test
     @DisplayName("create() — сохраняет и возвращает DTO")
     void testCreate() {
-        given(bookMapper.toEntity(bookDto)).willReturn(bookEntity);
-        given(bookRepository.save(bookEntity)).willReturn(bookEntity);
-        given(bookMapper.toDto(bookEntity)).willReturn(bookDto);
+        given(bookMapper.toEntity(bookDto)).willReturn(book);
+        willDoNothing().given(bookRepository).insert(book);
+        given(bookMapper.toDto(book)).willReturn(bookDto);
 
         BookDto result = bookService.create(bookDto);
 
         assertThat(result).isEqualTo(bookDto);
-        verify(bookRepository).save(bookEntity);
+        verify(bookMapper).toEntity(bookDto);
+        verify(bookRepository).insert(book);
+        verify(bookMapper).toDto(book);
     }
 
     @Test
     @DisplayName("update() — успешное обновление")
     void testUpdate() {
-        UUID id = bookEntity.getId();
-        given(bookRepository.findById(id)).willReturn(Optional.of(bookEntity));
+        UUID id = book.getId();
+        given(bookRepository.findById(id)).willReturn(Optional.of(book));
         doAnswer(inv -> {
             BookDto source = inv.getArgument(0);
-            BookEntity target = inv.getArgument(1);
+            Book target = inv.getArgument(1);
             target.setTitle(source.title());
             return null;
-        }).when(bookMapper).updateEntity(eq(bookDto), eq(bookEntity));
-        given(bookRepository.save(bookEntity)).willReturn(bookEntity);
-        given(bookMapper.toDto(bookEntity)).willReturn(bookDto);
+        }).when(bookMapper).updateEntity(eq(bookDto), eq(book));
+        willDoNothing().given(bookRepository).update(book);
+        given(bookMapper.toDto(book)).willReturn(bookDto);
 
         BookDto result = bookService.update(id, bookDto);
 
         assertThat(result).isEqualTo(bookDto);
         verify(bookRepository).findById(id);
-        verify(bookRepository).save(bookEntity);
+        verify(bookMapper).updateEntity(bookDto, book);
+        verify(bookRepository).update(book);
+        verify(bookMapper).toDto(book);
     }
 
     @Test
@@ -147,12 +149,12 @@ class BookServiceTest {
     @Test
     @DisplayName("delete() — успешное удаление")
     void testDelete() {
-        UUID id = bookEntity.getId();
-        given(bookRepository.existsById(id)).willReturn(true);
+        UUID id = book.getId();
+        willDoNothing().given(bookRepository).delete(id);
 
         bookService.delete(id);
 
-        verify(bookRepository).deleteById(id);
+        verify(bookRepository).delete(id);
     }
 
     @Test
@@ -160,12 +162,12 @@ class BookServiceTest {
     void testDeleteNotFound() {
         UUID id = UUID.randomUUID();
         willThrow(new EmptyResultDataAccessException(1))
-                .given(bookRepository).deleteById(id);
+                .given(bookRepository).delete(id);
 
         assertThatThrownBy(() -> bookService.delete(id))
                 .isInstanceOf(EntityNotFoundException.class)
-                .hasMessageContaining("Book not found: " + id);
+                .hasMessageContaining("Book not found");
 
-        verify(bookRepository).deleteById(id);
+        verify(bookRepository).delete(id);
     }
 }
