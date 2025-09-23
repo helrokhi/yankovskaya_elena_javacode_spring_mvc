@@ -1,4 +1,6 @@
 package ru.pro.service;
 
-public interface DepartmentService {
+import ru.pro.model.dto.DepartmentDto;
+
+public interface DepartmentService extends CrudService<DepartmentDto, DepartmentDto> {
 }

@@ -1,13 +1,14 @@
 package ru.pro.service;
 
+import java.util.List;
 import java.util.UUID;
 
-public interface CrudService<T> {
+public interface CrudService<T, P> {
     T create(T t);
 
-    T findAll();
+    List<P> findAll();
 
-    T findById(UUID id);
+    P findById(UUID id);
 
     T update(UUID id, T t);
 
