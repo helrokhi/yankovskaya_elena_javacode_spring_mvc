@@ -1,4 +1,4 @@
 CREATE TABLE departments (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY,
     name VARCHAR(255) NOT NULL UNIQUE
 );
