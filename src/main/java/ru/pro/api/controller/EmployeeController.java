@@ -24,8 +24,8 @@ public class EmployeeController implements EmployeeApi {
     }
 
     @Override
-    public ResponseEntity<EmployeeProjection> findById(UUID id) {
-        return ResponseEntity.ok(employeeService.findById(id));
+    public ResponseEntity<EmployeeProjection> findById(String id) {
+        return ResponseEntity.ok(employeeService.findById(UUID.fromString(id)));
     }
 
     @Override
@@ -35,13 +35,13 @@ public class EmployeeController implements EmployeeApi {
     }
 
     @Override
-    public ResponseEntity<EmployeeDto> update(UUID id, EmployeeDto dto) {
-        return ResponseEntity.ok(employeeService.update(id, dto));
+    public ResponseEntity<EmployeeDto> update(String id, EmployeeDto dto) {
+        return ResponseEntity.ok(employeeService.update(UUID.fromString(id), dto));
     }
 
     @Override
-    public ResponseEntity<Void> deleteById(UUID id) {
-        employeeService.delete(id);
+    public ResponseEntity<Void> deleteById(String id) {
+        employeeService.delete(UUID.fromString(id));
         return ResponseEntity.noContent().build();
     }
 }

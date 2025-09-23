@@ -9,7 +9,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,14 +31,11 @@ public class EmployeeEntity {
     private UUID id;
 
     @Column(nullable = false)
-    @NotBlank(message = "FirstName cannot be blank")
     private String firstName;
 
     @Column(nullable = false)
-    @NotBlank(message = "LastName cannot be blank")
     private String lastName;
 
-    @NotBlank(message = "Position cannot be blank")
     private String position;
 
     @Column(precision = 15, scale = 2, nullable = false)

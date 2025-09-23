@@ -56,11 +56,15 @@ public class EmployeeServiceImpl implements EmployeeService {
     public EmployeeDto update(UUID id, EmployeeDto dto) {
         EmployeeEntity target = employeeRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Employee not found with id: " + id));
-
-        DepartmentEntity department = departmentRepository.findById(UUID.fromString(dto.departmentId()))
-                .orElseThrow(() -> new EntityNotFoundException("Department not found with id: " + dto.departmentId()));
+        log.info("{} ", target.getId());
 
         employeeMapper.updateEntity(dto, target);
+        if (dto.departmentId() != null) {
+            DepartmentEntity department = departmentRepository.findById(UUID.fromString(dto.departmentId()))
+                    .orElseThrow(() -> new EntityNotFoundException("Department not found with id: " + dto.departmentId()));
+            target.setDepartment(department);
+            log.info("{} ", department.getId());
+        }
 
         EmployeeEntity updated = employeeRepository.save(target);
         return employeeMapper.toDto(updated);

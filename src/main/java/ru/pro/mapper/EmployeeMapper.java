@@ -19,5 +19,6 @@ public interface EmployeeMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = IGNORE)
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "department", ignore = true)
     void updateEntity(EmployeeDto source, @MappingTarget EmployeeEntity target);
 }

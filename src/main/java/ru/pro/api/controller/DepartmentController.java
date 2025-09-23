@@ -23,8 +23,8 @@ public class DepartmentController implements DepartmentApi {
     }
 
     @Override
-    public ResponseEntity<DepartmentDto> findById(UUID id) {
-        return ResponseEntity.ok(departmentService.findById(id));
+    public ResponseEntity<DepartmentDto> findById(String id) {
+        return ResponseEntity.ok(departmentService.findById(UUID.fromString(id)));
     }
 
     @Override
@@ -34,13 +34,13 @@ public class DepartmentController implements DepartmentApi {
     }
 
     @Override
-    public ResponseEntity<DepartmentDto> update(UUID id, DepartmentDto dto) {
-        return ResponseEntity.ok(departmentService.update(id, dto));
+    public ResponseEntity<DepartmentDto> update(String id, DepartmentDto dto) {
+        return ResponseEntity.ok(departmentService.update(UUID.fromString(id), dto));
     }
 
     @Override
-    public ResponseEntity<Void> deleteById(UUID id) {
-        departmentService.delete(id);
+    public ResponseEntity<Void> deleteById(String id) {
+        departmentService.delete(UUID.fromString(id));
         return ResponseEntity.noContent().build();
     }
 }
