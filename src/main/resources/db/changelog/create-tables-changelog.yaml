@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - include:
+      file: 001-create-departments.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: 002-create-employees.yaml
+      relativeToChangelogFile: true

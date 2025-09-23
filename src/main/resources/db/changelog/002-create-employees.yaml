@@ -1,0 +1,46 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002
+      author: Elena_Yankovskaya
+      changes:
+        - createTable:
+            tableName: employees
+            columns:
+              - column:
+                  name: id
+                  type: VARCHAR(36)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: first_name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: position
+                  type: VARCHAR(255)
+              - column:
+                  name: salary
+                  type: NUMERIC(15,2)
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: department_id
+                  type: VARCHAR(36)
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: employees
+            baseColumnNames: department_id
+            constraintName: fk_employee_department
+            referencedTableName: departments
+            referencedColumnNames: id
+            onDelete: CASCADE
