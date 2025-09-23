@@ -30,9 +30,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     public List<DepartmentDto> findAll() {
         List<DepartmentEntity> entities = departmentRepository.findAll();
-        return entities.stream()
-                .map(departmentMapper::toDto)
-                .toList();
+        return departmentMapper.toDtoList(entities);
     }
 
 

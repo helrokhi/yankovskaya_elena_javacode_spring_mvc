@@ -7,8 +7,6 @@ import org.mapstruct.MappingTarget;
 import ru.pro.model.dto.EmployeeDto;
 import ru.pro.model.entity.EmployeeEntity;
 
-import java.util.List;
-
 import static org.mapstruct.NullValuePropertyMappingStrategy.IGNORE;
 
 @Mapper(componentModel = "spring")
@@ -16,9 +14,8 @@ public interface EmployeeMapper {
     @Mapping(target = "departmentId", source = "department.id")
     EmployeeDto toDto(EmployeeEntity entity);
 
+    @Mapping(target = "department.id", source = "departmentId")
     EmployeeEntity toEntity(EmployeeDto dto);
-
-    List<EmployeeDto> toDtoList(List<EmployeeEntity> entities);
 
     @BeanMapping(nullValuePropertyMappingStrategy = IGNORE)
     @Mapping(target = "id", ignore = true)

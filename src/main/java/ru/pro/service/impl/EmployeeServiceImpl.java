@@ -1,7 +1,9 @@
 package ru.pro.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.pro.mapper.EmployeeMapper;
 import ru.pro.model.dto.EmployeeDto;
@@ -17,6 +19,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeRepository employeeRepository;
     private final DepartmentRepository departmentRepository;
@@ -24,10 +27,13 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeMapper employeeMapper;
 
     @Override
+    @Transactional
     public EmployeeDto create(EmployeeDto dto) {
-        if (!departmentRepository.existsById(UUID.fromString(dto.departmentId()))) {
-            throw new EntityNotFoundException("Department not found with id: " + dto.departmentId());
-        }
+        log.info("{} ", dto.departmentId());
+
+        DepartmentEntity department = departmentRepository.findById(UUID.fromString(dto.departmentId()))
+                .orElseThrow(() -> new EntityNotFoundException("Department not found with id: " + dto.departmentId()));
+
         EmployeeEntity entity = employeeMapper.toEntity(dto);
 
         EmployeeEntity saved = employeeRepository.save(entity);
@@ -46,23 +52,22 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    @Transactional
     public EmployeeDto update(UUID id, EmployeeDto dto) {
-        EmployeeEntity entity = employeeRepository.findById(id)
+        EmployeeEntity target = employeeRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Employee not found with id: " + id));
 
         DepartmentEntity department = departmentRepository.findById(UUID.fromString(dto.departmentId()))
                 .orElseThrow(() -> new EntityNotFoundException("Department not found with id: " + dto.departmentId()));
 
-        entity.setFirstName(dto.firstName());
-        entity.setLastName(dto.lastName());
-        entity.setPosition(dto.position());
-        entity.setDepartment(department);
+        employeeMapper.updateEntity(dto, target);
 
-        EmployeeEntity updated = employeeRepository.save(entity);
+        EmployeeEntity updated = employeeRepository.save(target);
         return employeeMapper.toDto(updated);
     }
 
     @Override
+    @Transactional
     public void delete(UUID id) {
         if (!employeeRepository.existsById(id)) {
             throw new EntityNotFoundException("Employee not found with id: " + id);
