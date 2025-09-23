@@ -16,10 +16,10 @@ public record EmployeeDto(
                 message = "Salary must be a number with max two decimal places",
                 groups = {OnCreate.class, OnUpdate.class})
         String salary,
-        @NotBlank(message = "Id cannot be blank", groups = OnCreate.class)
+        @NotBlank(message = "DepartmentId cannot be blank", groups = OnCreate.class)
         @Pattern(
                 regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
-                message = "ID must be a valid UUID format",
+                message = "DepartmentId must be a valid UUID format",
                 groups = {OnCreate.class, OnUpdate.class}       )
         String departmentId
 ) {

@@ -37,7 +37,10 @@ public interface DepartmentApi {
     }
 
     @PostMapping
-    default ResponseEntity<DepartmentDto> create(@Valid @RequestBody DepartmentDto dto) {
+    default ResponseEntity<DepartmentDto> create(
+            @RequestBody
+            @Valid
+            DepartmentDto dto) {
         return new ResponseEntity<>(NOT_IMPLEMENTED);
     }
 
@@ -47,7 +50,10 @@ public interface DepartmentApi {
             @NotBlank
             @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
                     message = "Invalid UUID format")
-            String id, @Valid @RequestBody DepartmentDto dto) {
+            String id,
+            @RequestBody
+            @Valid
+            DepartmentDto dto) {
         return new ResponseEntity<>(NOT_IMPLEMENTED);
     }
 
