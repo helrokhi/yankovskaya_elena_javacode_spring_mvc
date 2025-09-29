@@ -30,7 +30,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductDto findById(UUID id) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Product not found" + id));
+                .orElseThrow(() -> new EntityNotFoundException("Product not found with id: " + id));
         return productMapper.toDto(product);
     }
 
@@ -46,7 +46,7 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public ProductDto update(UUID id, ProductDto dto) {
         Product target = productRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Product not found" + id));
+                .orElseThrow(() -> new EntityNotFoundException("Product not found with id: " + id));
         productMapper.updateEntity(dto, target);
         Product updated = productRepository.save(target);
         return productMapper.toDto(updated);
@@ -55,10 +55,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public void deleteById(UUID id) {
-        try {
-            productRepository.deleteById(id);
-        } catch (EmptyResultDataAccessException e) {
-            throw new EntityNotFoundException("Product not found" + id);
-        }
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Product not found with id: " + id));
+        productRepository.delete(product);
     }
 }

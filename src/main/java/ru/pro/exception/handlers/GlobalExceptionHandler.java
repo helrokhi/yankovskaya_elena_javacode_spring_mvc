@@ -1,21 +1,23 @@
 package ru.pro.exception.handlers;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import ru.pro.exception.ApiException;
-import ru.pro.exception.BadRequestInvalidRequestFormatException;
 import ru.pro.exception.wrappers.ErrorResponse;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
@@ -25,100 +27,104 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationErrors(MethodArgumentNotValidException ex) {
-        Optional<FieldError> optionalError = Optional.of(ex)
-                .map(MethodArgumentNotValidException::getBindingResult)
-                .flatMap(result -> result.getFieldErrors().stream().findFirst());
+    @ExceptionHandler({MethodArgumentNotValidException.class, ConstraintViolationException.class})
+    public ResponseEntity<ErrorResponse> handleValidationExceptions(Exception ex) {
 
-        if (optionalError.isEmpty()) {
-            log.warn("Ошибка валидации без FieldError", ex);
-            return buildResponse(
-                    BAD_REQUEST.value(),
-                    "INVALID_REQUEST_FORMAT",
-                    "Ошибка валидации",
-                    Map.of(),
-                    now()
-            );
+        Map<String, Object> details = new HashMap<>();
+
+        if (ex instanceof MethodArgumentNotValidException manv) {
+            // Ошибки DTO (@RequestBody)
+            manv.getBindingResult().getFieldErrors()
+                    .forEach(fe -> details.put(fe.getField(),
+                            Map.of(
+                                    "rejectedValue", Optional.ofNullable(fe.getRejectedValue()).orElse("null"),
+                                    "message", Objects.requireNonNull(fe.getDefaultMessage())
+                            )));
+        } else if (ex instanceof ConstraintViolationException cve) {
+            // Ошибки параметров метода (@PathVariable, @RequestParam)
+            cve.getConstraintViolations().forEach(cv -> {
+                String field = cv.getPropertyPath().toString();
+                details.put(field,
+                        Map.of(
+                                "rejectedValue", cv.getInvalidValue(),
+                                "message", cv.getMessage()
+                        ));
+            });
         }
 
-        FieldError fieldError = optionalError.get();
+        logAtLevel(BAD_REQUEST, "VALIDATION_ERROR", ex);
 
-        String field = fieldError.getField();
-        String value = Optional.ofNullable(fieldError.getRejectedValue()).map(Object::toString).orElse("null");
-        String expected = fieldError.getDefaultMessage();
-        ApiException wrapped = new BadRequestInvalidRequestFormatException(field, value, expected);
-
-        HttpStatus status = HttpStatus.valueOf(wrapped.getStatusCode());
-        logAtLevel(status, wrapped.getCode(), ex);
-        return buildResponse(
-                wrapped.getStatusCode(),
-                wrapped.getCode(),
-                wrapped.getMessage(),
-                wrapped.getDetails(),
-                wrapped.getTimestamp()
+        ErrorResponse errorResponse = new ErrorResponse(
+                BAD_REQUEST.value(),
+                "VALIDATION_ERROR",
+                "Некорректный формат запроса",
+                Map.copyOf(details),
+                now()
         );
+
+        return ResponseEntity.badRequest().body(errorResponse);
     }
 
+    // --- Обработка кастомных исключений ApiException ---
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<ErrorResponse> handleApiException(ApiException ex) {
-        HttpStatus status = HttpStatus.valueOf(ex.getStatusCode());
-        logAtLevel(status, ex.getCode(), ex);
-        return buildResponse(
-                ex.getStatusCode(),
-                ex.getCode(),
-                ex.getMessage(),
-                ex.getDetails(),
-                ex.getTimestamp()
-        );
+        logAtLevel(HttpStatus.valueOf(ex.getStatusCode()), ex.getCode(), ex);
+        return ResponseEntity.status(ex.getStatusCode())
+                .body(new ErrorResponse(
+                        ex.getStatusCode(),
+                        ex.getCode(),
+                        ex.getMessage(),
+                        ex.getDetails(),
+                        ex.getTimestamp()
+                ));
     }
 
+    // --- Обработка EntityNotFoundException ---
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleEntityNotFound(EntityNotFoundException ex) {
         return handleWalletError(NOT_FOUND, "ENTITY_NOT_FOUND", ex.getMessage(), ex);
     }
 
+    // --- Обработка IllegalArgumentException ---
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException ex) {
         return handleWalletError(BAD_REQUEST, "INVALID_ARGUMENT", ex.getMessage(), ex);
     }
 
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ErrorResponse> handleInvalidJson(HttpMessageNotReadableException ex) {
-        Throwable rootCause = ex.getMostSpecificCause();
-        String message = rootCause.getMessage();
-        return handleWalletError(BAD_REQUEST, "INVALID_JSON", message, ex);
+    // --- Обработка ошибок JSON и UUID ---
+    @ExceptionHandler({HttpMessageNotReadableException.class, MethodArgumentTypeMismatchException.class})
+    public ResponseEntity<ErrorResponse> handleInvalidInput(Exception ex) {
+        String code = ex instanceof MethodArgumentTypeMismatchException ? "INVALID_UUID" : "INVALID_JSON";
+        String message = ex.getMessage();
+        return handleWalletError(BAD_REQUEST, code, message, ex);
     }
 
+    // --- Универсальный обработчик для остальных исключений ---
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleOtherExceptions(Exception ex) {
-        log.error("Необработанное исключение", ex);
-        return buildResponse(
-                INTERNAL_SERVER_ERROR.value(),
+        logAtLevel(INTERNAL_SERVER_ERROR, "INTERNAL_ERROR", ex);
+        return handleWalletError(
+                INTERNAL_SERVER_ERROR,
                 "INTERNAL_ERROR",
-                "Произошла внутренняя ошибка. Попробуйте позже.",
-                Map.of(),
-                now()
-        );
+                "Произошла внутренняя ошибка. Попробуйте позже.", ex);
     }
 
     private ResponseEntity<ErrorResponse> handleWalletError(
             HttpStatus status, String code, String message, Throwable ex) {
         log.warn(code, ex);
-        return buildResponse(status.value(), code, message, Map.of(), now());
+        return buildResponse(status.value(), code, message, Map.of());
     }
 
     private ResponseEntity<ErrorResponse> buildResponse(int statusCode,
                                                         String code,
                                                         String message,
-                                                        Map<String, Object> details,
-                                                        Timestamp timestamp) {
+                                                        Map<String, Object> details) {
         ErrorResponse error = new ErrorResponse(
                 statusCode,
                 code,
                 message,
                 details,
-                timestamp
+                now()
         );
         return ResponseEntity.status(statusCode).body(error);
     }

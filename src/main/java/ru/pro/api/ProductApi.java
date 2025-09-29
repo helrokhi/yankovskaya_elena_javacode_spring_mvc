@@ -1,6 +1,5 @@
 package ru.pro.api;
 
-import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,22 +24,22 @@ public interface ProductApi {
     }
 
     @GetMapping("/{id}")
-    default ResponseEntity<ProductDto> findById(@Valid @PathVariable UUID id) {
+    default ResponseEntity<ProductDto> findById(@PathVariable UUID id) {
         return new ResponseEntity<>(NOT_IMPLEMENTED);
     }
 
     @PostMapping
-    default ResponseEntity<ProductDto> create(@Valid @RequestBody ProductDto dto) {
+    default ResponseEntity<ProductDto> create(@RequestBody ProductDto dto) {
         return new ResponseEntity<>(NOT_IMPLEMENTED);
     }
 
     @PutMapping("/{id}")
-    default ResponseEntity<ProductDto> update(@Valid @PathVariable UUID id, @Valid @RequestBody ProductDto dto) {
+    default ResponseEntity<ProductDto> update(@PathVariable UUID id, @RequestBody ProductDto dto) {
         return new ResponseEntity<>(NOT_IMPLEMENTED);
     }
 
     @DeleteMapping("/{id}")
-    default ResponseEntity<Void> deleteById(@Valid @PathVariable UUID id) {
+    default ResponseEntity<Void> deleteById(@PathVariable UUID id) {
         return new ResponseEntity<>(NOT_IMPLEMENTED);
     }
 }

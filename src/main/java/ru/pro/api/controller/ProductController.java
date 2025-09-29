@@ -1,5 +1,6 @@
 package ru.pro.api.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,23 +25,23 @@ public class ProductController implements ProductApi {
     }
 
     @Override
-    public ResponseEntity<ProductDto> findById(UUID id) {
+    public ResponseEntity<ProductDto> findById(@Valid UUID id) {
         return ResponseEntity.ok(productService.findById(id));
     }
 
     @Override
-    public ResponseEntity<ProductDto> create(ProductDto dto) {
+    public ResponseEntity<ProductDto> create(@Valid ProductDto dto) {
         ProductDto created = productService.create(dto);
         return ResponseEntity.status(CREATED).body(created);
     }
 
     @Override
-    public ResponseEntity<ProductDto> update(UUID id, ProductDto dto) {
+    public ResponseEntity<ProductDto> update(@Valid UUID id, @Valid ProductDto dto) {
         return ResponseEntity.ok(productService.update(id, dto));
     }
 
     @Override
-    public ResponseEntity<Void> deleteById(UUID id) {
+    public ResponseEntity<Void> deleteById(@Valid UUID id) {
         productService.deleteById(id);
         return ResponseEntity.noContent().build();
     }

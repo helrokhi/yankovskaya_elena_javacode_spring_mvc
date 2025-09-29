@@ -1,6 +1,5 @@
 package ru.pro.api;
 
-import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,12 +16,12 @@ import static org.springframework.http.HttpStatus.NOT_IMPLEMENTED;
 public interface OrderApi {
 
     @GetMapping("/{id}")
-    default ResponseEntity<OrderDto> findById(@Valid @PathVariable UUID id) {
+    default ResponseEntity<OrderDto> findById(@PathVariable UUID id) {
         return new ResponseEntity<>(NOT_IMPLEMENTED);
     }
 
     @PostMapping
-    default ResponseEntity<OrderDto> create(@Valid @RequestBody OrderDto dto) {
+    default ResponseEntity<OrderDto> create(@RequestBody OrderDto dto) {
         return new ResponseEntity<>(NOT_IMPLEMENTED);
     }
 }
