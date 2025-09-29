@@ -10,9 +10,6 @@ import java.util.Set;
 
 public record OrderDto(
         String id,
-        @NotBlank(message = "Id cannot be blank")
-        @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
-                message = "ID must be a valid UUID format")
         String customerId,
         @NotEmpty(message = "Order items cannot be empty")
         Set<@Valid OrderItemDto> items,

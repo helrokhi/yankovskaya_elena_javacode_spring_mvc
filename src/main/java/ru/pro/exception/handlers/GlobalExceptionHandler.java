@@ -6,11 +6,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import ru.pro.exception.ApiException;
+import ru.pro.exception.JwtAuthenticationException;
 import ru.pro.exception.wrappers.ErrorResponse;
 
 import java.sql.Timestamp;
@@ -21,6 +23,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
@@ -97,6 +100,25 @@ public class GlobalExceptionHandler {
         String code = ex instanceof MethodArgumentTypeMismatchException ? "INVALID_UUID" : "INVALID_JSON";
         String message = ex.getMessage();
         return handleWalletError(BAD_REQUEST, code, message, ex);
+    }
+
+    // --- Обработка AccessDeniedException ---
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex) {
+        logAtLevel(FORBIDDEN, "ACCESS_DENIED", ex);
+        return handleWalletError(FORBIDDEN, "ACCESS_DENIED", "Доступ к ресурсу запрещен", ex);
+    }
+
+    // --- Обработка JwtAuthenticationException ---
+    @ExceptionHandler(JwtAuthenticationException.class)
+    public ResponseEntity<ErrorResponse> handleJwtAuthentication(JwtAuthenticationException ex) {
+        logAtLevel(ex.getHttpStatus(), "JWT_AUTH_ERROR", ex);
+        return handleWalletError(
+                ex.getHttpStatus(),
+                "JWT_AUTH_ERROR",
+                ex.getMessage(),
+                ex
+        );
     }
 
     // --- Универсальный обработчик для остальных исключений ---

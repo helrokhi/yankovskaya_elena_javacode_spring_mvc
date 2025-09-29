@@ -1,0 +1,16 @@
+databaseChangeLog:
+  - include:
+      file: 001-create-customer.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: 002-create-product.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: 003-create-order.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: 004-create-order-item.yaml
+      relativeToChangelogFile: true

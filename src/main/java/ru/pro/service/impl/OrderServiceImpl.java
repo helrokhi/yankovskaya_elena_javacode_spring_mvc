@@ -3,6 +3,7 @@ package ru.pro.service.impl;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import ru.pro.mapper.OrderItemMapper;
 import ru.pro.mapper.OrderMapper;
@@ -16,6 +17,7 @@ import ru.pro.repository.OrderItemRepository;
 import ru.pro.repository.OrderRepository;
 import ru.pro.repository.ProductRepository;
 import ru.pro.service.OrderService;
+import ru.pro.utils.SecurityUtils;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
@@ -35,18 +37,17 @@ public class OrderServiceImpl implements OrderService {
 
 
     @Override
-    public OrderDto findById(UUID id) {
-        Order entity = orderRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Order not found with id: " + id));
-        Set<OrderItem> items = orderItemRepository.findByOrderId(entity.getId());
+    public OrderDto findById(UUID id, Authentication authentication) {
+        Order order = SecurityUtils.getOrderByIdWithPermission(id, authentication, customerRepository, orderRepository);
 
-        return orderMapper.toDto(entity, orderItemMapper.toDtoSet(items));
+        Set<OrderItem> items = orderItemRepository.findByOrderId(order.getId());
+        return orderMapper.toDto(order, orderItemMapper.toDtoSet(items));
     }
 
     @Override
     @Transactional
-    public OrderDto create(OrderDto dto) {
-        UUID customerId = UUID.fromString(dto.customerId());
+    public OrderDto create(OrderDto dto, Authentication authentication) {
+        UUID customerId = SecurityUtils.getCustomerId(authentication, customerRepository);
         if (!customerRepository.existsById(customerId)) {
             throw new EntityNotFoundException("Customer not found with id: " + customerId);
         }
@@ -60,6 +61,7 @@ public class OrderServiceImpl implements OrderService {
 
         order.setTotalPrice(totalPrice);
         Set<OrderItem> items = new HashSet<>();
+        Set<Product> products = new HashSet<>();
         Order saved = orderRepository.save(order);
         for (OrderItemDto item : dto.items()) {
             Product product = productRepository.findById(UUID.fromString(item.productId()))
@@ -71,12 +73,12 @@ public class OrderServiceImpl implements OrderService {
 
             product.setQuantityStock(product.getQuantityStock() - item.quantity());
 
-            OrderItem orderItem = orderItemMapper.toEntity(item);
-            orderItem.setOrder(order);
-            OrderItem save = orderItemRepository.save(orderItem);
-            items.add(save);
-            productRepository.save(product);
+            items.add(orderItemMapper.toEntity(item));
+            products.add(product);
         }
+        productRepository.saveAll(products);
+        orderItemRepository.saveAll(items);
+
         return orderMapper.toDto(saved, orderItemMapper.toDtoSet(items));
     }
 }

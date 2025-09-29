@@ -2,18 +2,25 @@ package ru.pro.model.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import ru.pro.model.enums.UserRole;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
+
+import static lombok.AccessLevel.NONE;
+import static ru.pro.model.enums.UserRole.USER;
 
 @Entity
 @Table(name = "customers")
@@ -26,20 +33,34 @@ public class Customer {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @NotBlank
     @Column(nullable = false)
     private String firstName;
 
-    @NotBlank
     @Column(nullable = false)
     private String lastName;
 
-    @NotBlank
     @Column(nullable = false, unique = true)
-    @Email
     private String email;
 
-    @NotBlank
+    @Column(nullable = false)
+    private String password;
+
     @Column(nullable = false, unique = true)
     private String contactNumber;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private UserRole role = USER;
+
+    @Column(nullable = false)
+    private boolean isAccountNonLocked = true;
+
+    @CreationTimestamp
+    @Column(updatable = false)
+    @Setter(NONE)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Setter(NONE)
+    private LocalDateTime updatedAt;
 }

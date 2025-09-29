@@ -1,6 +1,7 @@
 package ru.pro.api;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,12 +17,12 @@ import static org.springframework.http.HttpStatus.NOT_IMPLEMENTED;
 public interface OrderApi {
 
     @GetMapping("/{id}")
-    default ResponseEntity<OrderDto> findById(@PathVariable UUID id) {
+    default ResponseEntity<OrderDto> findById(@PathVariable UUID id, Authentication authentication) {
         return new ResponseEntity<>(NOT_IMPLEMENTED);
     }
 
     @PostMapping
-    default ResponseEntity<OrderDto> create(@RequestBody OrderDto dto) {
+    default ResponseEntity<OrderDto> create(@RequestBody OrderDto dto, Authentication authentication) {
         return new ResponseEntity<>(NOT_IMPLEMENTED);
     }
 }

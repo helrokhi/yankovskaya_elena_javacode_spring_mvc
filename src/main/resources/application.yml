@@ -3,18 +3,19 @@ server:
 
 spring:
   datasource:
-    url: jdbc:h2:mem:shopdb;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+    url: jdbc:h2:mem:demo;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
     driver-class-name: org.h2.Driver
     username: sa
-    password:
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    show-sql: true
-  flyway:
+    password: password
+  liquibase:
     enabled: true
-    locations: classpath:db/migration
+    change-log: classpath:db/changelog/master.yaml
   h2:
     console:
       enabled: true
       path: /h2-console
+
+jwt:
+  secret: "nH8g1l9R8f2+PjKdM2Xk5wE3bRzZ+qKJ8yLFO0VmV6Y="
+  header: "Authorization"
+  expiration: 3600

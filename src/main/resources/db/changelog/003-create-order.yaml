@@ -1,0 +1,46 @@
+databaseChangeLog:
+  - changeSet:
+      id: 003
+      author: Elena_Yankovskaya
+      changes:
+        - createTable:
+            tableName: orders
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: customer_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: shipping_address
+                  type: VARCHAR(500)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: total_price
+                  type: DECIMAL(15,2)
+                  constraints:
+                    nullable: false
+                    checkCondition: total_price >= 0
+              - column:
+                  name: order_status
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: order_date
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+        - addForeignKeyConstraint:
+            constraintName: fk_orders_customer
+            baseTableName: orders
+            baseColumnNames: customer_id
+            referencedTableName: customers
+            referencedColumnNames: id
+            onDelete: CASCADE
