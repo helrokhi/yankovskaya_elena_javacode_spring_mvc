@@ -9,15 +9,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.pro.repository.ProductRepository;
 import ru.pro.model.entity.Product;
+import ru.pro.repository.ProductRepository;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -85,6 +86,7 @@ class ProductControllerTest {
                 """;
 
         mockMvc.perform(post("/api/v1/products")
+                        .with(httpBasic("testUser", "password123"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isCreated())
@@ -104,12 +106,13 @@ class ProductControllerTest {
                 """;
 
         mockMvc.perform(post("/api/v1/products")
+                        .with(httpBasic("testUser", "password123"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.name").exists())
-                .andExpect(jsonPath("$.price").exists())
-                .andExpect(jsonPath("$.quantityStock").exists());
+                .andExpect(jsonPath("$.details.name").exists())
+                .andExpect(jsonPath("$.details.price").exists())
+                .andExpect(jsonPath("$.details.quantityStock").exists());
     }
 
     @Test
@@ -124,6 +127,7 @@ class ProductControllerTest {
                 """;
 
         mockMvc.perform(put("/api/v1/products/{id}", savedProduct.getId())
+                        .with(httpBasic("admin", "admin123")) // admin может обновлять
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isOk())
@@ -143,6 +147,7 @@ class ProductControllerTest {
                 """;
 
         mockMvc.perform(put("/api/v1/products/{id}", UUID.randomUUID())
+                        .with(httpBasic("admin", "admin123"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isNotFound());
@@ -150,13 +155,36 @@ class ProductControllerTest {
 
     @Test
     void testDeleteProduct_Success() throws Exception {
-        mockMvc.perform(delete("/api/v1/products/{id}", savedProduct.getId()))
+        mockMvc.perform(delete("/api/v1/products/{id}", savedProduct.getId())
+                        .with(httpBasic("admin", "admin123")))
                 .andExpect(status().isNoContent());
     }
 
     @Test
     void testDeleteProduct_NotFound() throws Exception {
-        mockMvc.perform(delete("/api/v1/products/{id}", UUID.randomUUID()))
-                .andExpect(status().isNotFound());
+        UUID randomId = UUID.randomUUID();
+
+        mockMvc.perform(delete("/api/v1/products/{id}", randomId)
+                        .with(httpBasic("admin", "admin123")))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("ENTITY_NOT_FOUND"))
+                .andExpect(jsonPath("$.message").value("Product not found with id: " + randomId));
+    }
+
+    @Test
+    void testUnauthorizedOnCreateProduct() throws Exception {
+        String json = """
+                {
+                  "name": "Unauthorized",
+                  "description": "Should fail",
+                  "price": 10.00,
+                  "quantityStock": 5
+                }
+                """;
+
+        mockMvc.perform(post("/api/v1/products")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isUnauthorized());
     }
 }
