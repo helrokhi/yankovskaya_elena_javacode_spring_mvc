@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import ru.pro.exception.JwtAuthenticationException;
+import ru.pro.annotations.AuthLog;
 
 import javax.crypto.SecretKey;
 import java.util.Base64;
@@ -47,6 +48,7 @@ public class JwtTokenProvider {
         this.secretKey = Keys.hmacShaKeyFor(keyBytes);
     }
 
+    @AuthLog(action = "JWT_CREATED")
     public String createToken(String username, String role) {
         log.info("Creating token for user: {}", username);
 

@@ -18,3 +18,7 @@ databaseChangeLog:
   - include:
       file: 005-create-order-item.yaml
       relativeToChangelogFile: true
+
+  - include:
+      file: 011-create-auth-log.yaml
+      relativeToChangelogFile: true

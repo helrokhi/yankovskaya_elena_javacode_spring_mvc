@@ -15,7 +15,8 @@ public enum Permission {
     ORDER_READ_OWN("order:read:own"),
     ORDER_READ_ALL("order:read:all"),
 
-    USER_UPDATE("user:update");
+    USER_UPDATE("user:update"),
+    USER_READ("user:read");
 
     private final String permission;
 }

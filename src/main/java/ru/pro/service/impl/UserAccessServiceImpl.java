@@ -3,6 +3,7 @@ package ru.pro.service.impl;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.pro.annotations.AuthLog;
 import ru.pro.repository.UserAccessRepository;
 import ru.pro.service.UserAccessService;
 
@@ -13,6 +14,7 @@ public class UserAccessServiceImpl implements UserAccessService {
 
     @Override
     @Transactional
+    @AuthLog(action = "ACCOUNT_BLOCKED")
     public void lockAccount(String login) {
         userAccessRepository.findByLogin(login).ifPresent(userAccess -> {
             userAccess.setAccountNonLocked(false);

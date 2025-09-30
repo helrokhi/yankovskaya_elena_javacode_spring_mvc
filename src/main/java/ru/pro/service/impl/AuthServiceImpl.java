@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
+import ru.pro.annotations.AuthLog;
 import ru.pro.model.dto.AuthenticationRequestDto;
 import ru.pro.security.JwtTokenProvider;
 import ru.pro.security.LoginAttemptCache;
@@ -25,6 +26,7 @@ public class AuthServiceImpl implements AuthService {
     private final LoginAttemptCache loginAttemptCache;
 
     @Override
+    @AuthLog(action = "LOGIN_SUCCESS")
     public String authenticate(AuthenticationRequestDto request) {
         String login = request.login();
 

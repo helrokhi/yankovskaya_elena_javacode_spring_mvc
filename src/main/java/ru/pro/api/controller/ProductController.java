@@ -18,7 +18,6 @@ import static org.springframework.http.HttpStatus.CREATED;
 @RestController
 @RequiredArgsConstructor
 public class ProductController implements ProductApi {
-
     private final ProductService productService;
 
     @Override

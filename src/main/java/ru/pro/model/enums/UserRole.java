@@ -14,6 +14,7 @@ import static ru.pro.model.enums.Permission.PRODUCT_CREATE;
 import static ru.pro.model.enums.Permission.PRODUCT_DELETE;
 import static ru.pro.model.enums.Permission.PRODUCT_READ;
 import static ru.pro.model.enums.Permission.PRODUCT_UPDATE;
+import static ru.pro.model.enums.Permission.USER_READ;
 import static ru.pro.model.enums.Permission.USER_UPDATE;
 
 @Getter
@@ -30,7 +31,8 @@ public enum UserRole {
             PRODUCT_CREATE,
             PRODUCT_UPDATE,
             ORDER_READ_ALL,
-            USER_UPDATE
+            USER_UPDATE,
+            USER_READ
     )),
 
     SUPER_ADMIN(Set.of(
@@ -41,7 +43,8 @@ public enum UserRole {
             ORDER_CREATE,
             ORDER_READ_OWN,
             ORDER_READ_ALL,
-            USER_UPDATE
+            USER_UPDATE,
+            USER_READ
     ));
 
     private final Set<Permission> permissions;
