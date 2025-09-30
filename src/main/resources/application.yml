@@ -3,19 +3,37 @@ server:
 
 spring:
   datasource:
-    url: jdbc:h2:mem:demo;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+    url: jdbc:h2:mem:shop;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
     driver-class-name: org.h2.Driver
     username: sa
     password: password
+
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/master.yaml
+
   h2:
     console:
       enabled: true
       path: /h2-console
 
+  redis:
+    host: localhost
+    port: 6379
+    password:
+
+  cache:
+    type: redis
+    redis:
+      time-to-live: 600000  # 10 минут хранения данных в кэше (TTL)
+      cache-null-values: false  # Не кэшировать `null`-значения
+      use-key-prefix: true  # Добавлять префикс (предотвращает конфликты)
+
 jwt:
   secret: "nH8g1l9R8f2+PjKdM2Xk5wE3bRzZ+qKJ8yLFO0VmV6Y="
   header: "Authorization"
   expiration: 3600
+
+security:
+  login:
+    max-attempts: 5

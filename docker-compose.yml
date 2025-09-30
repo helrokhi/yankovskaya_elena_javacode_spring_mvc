@@ -1,0 +1,12 @@
+services:  # Определяем сервисы (контейнеры)
+  redis:
+    image: redis:latest  # Официальный образ Redis
+    container_name: redis_cache
+    restart: unless-stopped
+    ports:
+      - "6379:6379"  # Пробрасываем порт для доступа к Redis
+    volumes:
+      - redis_data:/data  # Сохраняем данные Redis
+
+volumes:  # Определяем тома для хранения данных
+  redis_data:

@@ -7,17 +7,14 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
 import ru.pro.model.dto.AuthenticationRequestDto;
-import ru.pro.repository.UserAccessRepository;
 import ru.pro.security.JwtTokenProvider;
+import ru.pro.security.LoginAttemptCache;
 import ru.pro.service.AuthService;
-
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,23 +22,27 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserDetailsService userDetailsService;
-    private final UserAccessRepository userAccessRepository;
+    private final LoginAttemptCache loginAttemptCache;
 
     @Override
     public String authenticate(AuthenticationRequestDto request) {
+        String login = request.login();
+
+        if (loginAttemptCache.isBlocked(login)) {
+            throw new LockedException("Account is temporarily locked due to failed login attempts");
+        }
+
         try {
             authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.login(), request.password())
+                    new UsernamePasswordAuthenticationToken(login, request.password())
             );
 
-            UserDetails userDetails = userDetailsService.loadUserByUsername(request.login());
+            loginAttemptCache.loginSucceeded(login);
 
-            if (!userDetails.isAccountNonLocked()) {
-                throw new LockedException("User account is locked due to multiple failed login attempts");
-            }
-
-            return jwtTokenProvider.createToken(request.login(), userDetails.getAuthorities().toString());
+            UserDetails userDetails = userDetailsService.loadUserByUsername(login);
+            return jwtTokenProvider.createToken(login, userDetails.getAuthorities().toString());
         } catch (BadCredentialsException ex) {
+            loginAttemptCache.loginFailed(login);
             throw new BadCredentialsException("Invalid login/password combination");
         }
     }
