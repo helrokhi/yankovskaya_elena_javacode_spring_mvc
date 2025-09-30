@@ -1,6 +1,6 @@
 --liquibase formatted sql
 --preconditions onFail:HALT onError:HALT
---changeset Elena_Yankovskaya:008
+--changeset Elena_Yankovskaya:010
 
 INSERT INTO order_items (id, order_id, product_id, quantity, price) VALUES
   ('b1111111-0000-0000-0000-000000000001','aaaaaaaa-0000-0000-0000-000000000001','10000000-0000-0000-0000-000000000001',1,1200.00),

@@ -2,46 +2,44 @@ package ru.pro.model.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.MapsId;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import ru.pro.model.enums.UserRole;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static lombok.AccessLevel.NONE;
+import static ru.pro.model.enums.UserRole.USER;
 
 @Entity
-@Table(name = "customers")
-@AllArgsConstructor
-@NoArgsConstructor
+@Table(name = "user_access")
 @Getter
 @Setter
-public class Customer {
+public class UserAccess {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @MapsId
-    @OneToOne
-    @JoinColumn(name = "id")
-    private UserAccess userAccess;
-
-    @Column(nullable = false)
-    private String firstName;
-
-    @Column(nullable = false)
-    private String lastName;
-
     @Column(nullable = false, unique = true)
-    private String contactNumber;
+    private String login;
+
+    @Column(nullable = false)
+    private String password;
+
+    @Enumerated(EnumType.STRING)
+    private UserRole role = USER;
+
+    @Column(nullable = false)
+    private boolean isAccountNonLocked = true;
 
     @CreationTimestamp
     @Column(updatable = false)

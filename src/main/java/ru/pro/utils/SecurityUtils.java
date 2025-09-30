@@ -4,26 +4,28 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.experimental.UtilityClass;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
-import ru.pro.model.entity.Customer;
 import ru.pro.model.entity.Order;
-import ru.pro.repository.CustomerRepository;
+import ru.pro.model.entity.UserAccess;
 import ru.pro.repository.OrderRepository;
+import ru.pro.repository.UserAccessRepository;
 
 import java.util.UUID;
 
 @UtilityClass
 public class SecurityUtils {
-    public UUID getCustomerId(Authentication authentication, CustomerRepository customerRepository) {
+    public UUID getCustomerId(
+            Authentication authentication,
+            UserAccessRepository userAccessRepository) {
         String email = authentication.getName();
-        return customerRepository.findByEmail(email)
-                .map(Customer::getId)
+        return userAccessRepository.findByLogin(email)
+                .map(UserAccess::getId)
                 .orElse(null);
     }
 
     public Order getOrderByIdWithPermission(
             UUID id,
             Authentication authentication,
-            CustomerRepository customerRepository,
+            UserAccessRepository userAccessRepository,
             OrderRepository orderRepository) {
         if (hasAuthority(authentication, "order:read:all")) {
             return orderRepository.findById(id)
@@ -32,8 +34,8 @@ public class SecurityUtils {
 
         if (hasAuthority(authentication, "order:read:own")) {
             String email = authentication.getName();
-            UUID customerId = customerRepository.findByEmail(email)
-                    .map(Customer::getId)
+            UUID customerId = userAccessRepository.findByLogin(email)
+                    .map(UserAccess::getId)
                     .orElseThrow(() -> new AccessDeniedException("Customer not found"));
 
             return orderRepository.findByIdAndCustomerId(id, customerId)

@@ -8,8 +8,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import ru.pro.model.entity.Customer;
-import ru.pro.repository.CustomerRepository;
+import ru.pro.model.entity.UserAccess;
+import ru.pro.repository.UserAccessRepository;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -18,31 +18,31 @@ import java.util.Collections;
 @Service
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
-    private final CustomerRepository customerRepository;
+    private final UserAccessRepository userAccessRepository;
 
     @Override
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
         log.info("Loading user by username: {}", login);
 
-        Customer customer = customerRepository.findByEmail(login)
+        UserAccess userAccess = userAccessRepository.findByLogin(login)
                 .orElseThrow(() -> {
                     log.warn("Customer {} doesn't exist", login);
                     return new UsernameNotFoundException("Customer doesn't exist");
                 });
 
         log.info("Customer {} / {} /{}",
-                customer.getEmail(),
-                customer.getPassword(),
-                customer.getRole());
+                userAccess.getLogin(),
+                userAccess.getPassword(),
+                userAccess.getRole());
 
         Collection<? extends GrantedAuthority> authorities =
-                customer.getRole() != null ?
-                        customer.getRole().getAuthorities() : Collections.emptyList();
+                userAccess.getRole() != null ?
+                        userAccess.getRole().getAuthorities() : Collections.emptyList();
 
         log.info("authorities {}", authorities);
         return new User(
-                customer.getEmail(),
-                customer.getPassword(),
+                userAccess.getLogin(),
+                userAccess.getPassword(),
                 authorities
         );
     }

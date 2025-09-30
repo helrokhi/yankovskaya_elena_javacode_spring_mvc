@@ -16,6 +16,7 @@ import ru.pro.repository.CustomerRepository;
 import ru.pro.repository.OrderItemRepository;
 import ru.pro.repository.OrderRepository;
 import ru.pro.repository.ProductRepository;
+import ru.pro.repository.UserAccessRepository;
 import ru.pro.service.OrderService;
 import ru.pro.utils.SecurityUtils;
 
@@ -31,6 +32,7 @@ public class OrderServiceImpl implements OrderService {
     private final ProductRepository productRepository;
     private final CustomerRepository customerRepository;
     private final OrderItemRepository orderItemRepository;
+    private final UserAccessRepository userAccessRepository;
 
     private final OrderMapper orderMapper;
     private final OrderItemMapper orderItemMapper;
@@ -38,7 +40,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderDto findById(UUID id, Authentication authentication) {
-        Order order = SecurityUtils.getOrderByIdWithPermission(id, authentication, customerRepository, orderRepository);
+        Order order = SecurityUtils.getOrderByIdWithPermission(id, authentication, userAccessRepository, orderRepository);
 
         Set<OrderItem> items = orderItemRepository.findByOrderId(order.getId());
         return orderMapper.toDto(order, orderItemMapper.toDtoSet(items));
@@ -47,7 +49,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public OrderDto create(OrderDto dto, Authentication authentication) {
-        UUID customerId = SecurityUtils.getCustomerId(authentication, customerRepository);
+        UUID customerId = SecurityUtils.getCustomerId(authentication, userAccessRepository);
         if (!customerRepository.existsById(customerId)) {
             throw new EntityNotFoundException("Customer not found with id: " + customerId);
         }
