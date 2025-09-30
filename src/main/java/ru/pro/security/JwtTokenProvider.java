@@ -1,6 +1,7 @@
 package ru.pro.security;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -20,6 +21,8 @@ import ru.pro.exception.JwtAuthenticationException;
 import javax.crypto.SecretKey;
 import java.util.Base64;
 import java.util.Date;
+
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 @Slf4j
 @Component
@@ -63,16 +66,21 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public boolean validateToken(String token) {
+    public void validateToken(String token) {
         try {
             Jws<Claims> claimsJws = Jwts.parser()
                     .verifyWith(secretKey)
                     .build()
                     .parseSignedClaims(token);
-            return !claimsJws.getPayload().getExpiration().before(new Date());
+
+            Date expiration = claimsJws.getPayload().getExpiration();
+            if (expiration.before(new Date())) {
+                throw new JwtAuthenticationException("Token expired", UNAUTHORIZED);
+            }
+        } catch (ExpiredJwtException e) {
+            throw new JwtAuthenticationException("Token expired", UNAUTHORIZED);
         } catch (JwtException | IllegalArgumentException e) {
-            log.warn("Invalid JWT token: {}", e.getMessage());
-            throw new JwtAuthenticationException(e.getMessage());
+            throw new JwtAuthenticationException("Invalid JWT token", UNAUTHORIZED);
         }
     }
 

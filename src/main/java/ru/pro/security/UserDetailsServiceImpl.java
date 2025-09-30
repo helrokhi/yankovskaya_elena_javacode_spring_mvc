@@ -26,11 +26,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         UserAccess userAccess = userAccessRepository.findByLogin(login)
                 .orElseThrow(() -> {
-                    log.warn("Customer {} doesn't exist", login);
-                    return new UsernameNotFoundException("Customer doesn't exist");
+                    log.warn("UserAccess {} doesn't exist", login);
+                    return new UsernameNotFoundException("UserAccess doesn't exist");
                 });
 
-        log.info("Customer {} / {} /{}",
+        log.info("UserAccess  {} / {} / {}",
                 userAccess.getLogin(),
                 userAccess.getPassword(),
                 userAccess.getRole());

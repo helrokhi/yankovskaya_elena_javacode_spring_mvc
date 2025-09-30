@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.LockedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -26,6 +28,7 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 @RestControllerAdvice
 @Slf4j
@@ -85,13 +88,13 @@ public class GlobalExceptionHandler {
     // --- Обработка EntityNotFoundException ---
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleEntityNotFound(EntityNotFoundException ex) {
-        return handleWalletError(NOT_FOUND, "ENTITY_NOT_FOUND", ex.getMessage(), ex);
+        return handleError(NOT_FOUND, "ENTITY_NOT_FOUND", ex.getMessage(), ex);
     }
 
     // --- Обработка IllegalArgumentException ---
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException ex) {
-        return handleWalletError(BAD_REQUEST, "INVALID_ARGUMENT", ex.getMessage(), ex);
+        return handleError(BAD_REQUEST, "INVALID_ARGUMENT", ex.getMessage(), ex);
     }
 
     // --- Обработка ошибок JSON и UUID ---
@@ -99,21 +102,21 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleInvalidInput(Exception ex) {
         String code = ex instanceof MethodArgumentTypeMismatchException ? "INVALID_UUID" : "INVALID_JSON";
         String message = ex.getMessage();
-        return handleWalletError(BAD_REQUEST, code, message, ex);
+        return handleError(BAD_REQUEST, code, message, ex);
     }
 
     // --- Обработка AccessDeniedException ---
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex) {
         logAtLevel(FORBIDDEN, "ACCESS_DENIED", ex);
-        return handleWalletError(FORBIDDEN, "ACCESS_DENIED", "Доступ к ресурсу запрещен", ex);
+        return handleError(FORBIDDEN, "ACCESS_DENIED", "Доступ к ресурсу запрещен", ex);
     }
 
     // --- Обработка JwtAuthenticationException ---
     @ExceptionHandler(JwtAuthenticationException.class)
     public ResponseEntity<ErrorResponse> handleJwtAuthentication(JwtAuthenticationException ex) {
         logAtLevel(ex.getHttpStatus(), "JWT_AUTH_ERROR", ex);
-        return handleWalletError(
+        return handleError(
                 ex.getHttpStatus(),
                 "JWT_AUTH_ERROR",
                 ex.getMessage(),
@@ -125,13 +128,24 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleOtherExceptions(Exception ex) {
         logAtLevel(INTERNAL_SERVER_ERROR, "INTERNAL_ERROR", ex);
-        return handleWalletError(
+        return handleError(
                 INTERNAL_SERVER_ERROR,
                 "INTERNAL_ERROR",
                 "Произошла внутренняя ошибка. Попробуйте позже.", ex);
     }
 
-    private ResponseEntity<ErrorResponse> handleWalletError(
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ErrorResponse> handleAuthenticationException(AuthenticationException ex) {
+        HttpStatus status = ex instanceof LockedException ? FORBIDDEN : UNAUTHORIZED;
+        return handleError(
+                status,
+                "AUTH_ERROR",
+                ex.getMessage(),
+                ex
+        );
+    }
+
+    private ResponseEntity<ErrorResponse> handleError(
             HttpStatus status, String code, String message, Throwable ex) {
         log.warn(code, ex);
         return buildResponse(status.value(), code, message, Map.of());

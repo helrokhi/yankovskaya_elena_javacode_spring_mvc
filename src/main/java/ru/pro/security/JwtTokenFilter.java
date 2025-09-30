@@ -11,7 +11,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import ru.pro.exception.JwtAuthenticationException;
 
 import java.io.IOException;
 
@@ -27,34 +26,18 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse servletResponse,
             @NonNull FilterChain filterChain)
             throws ServletException, IOException {
-
         String requestURI = servletRequest.getRequestURI();
         log.info("requestURI {}", requestURI);
-
-        filterChain.doFilter(servletRequest, servletResponse);
 
         String token = jwtTokenProvider.resolveToken(servletRequest);
         log.info("Processing token: {}", token != null ? token.substring(0, 10) + "..." : "null");
 
         if (token != null) {
-            try {
-                if (!jwtTokenProvider.validateToken(token)) {
-                    log.warn("Invalid token detected");
-                    SecurityContextHolder.clearContext();
-                    servletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT token");
-                    return;
-                }
-
-                Authentication authentication = jwtTokenProvider.getAuthentication(token);
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            } catch (JwtAuthenticationException e) {
-                log.warn("JWT authentication failed: {}", e.getMessage());
-                SecurityContextHolder.clearContext();
-                servletResponse.sendError(e.getHttpStatus().value(), e.getMessage());
-
-                return;
-            }
+            jwtTokenProvider.validateToken(token);
+            Authentication authentication = jwtTokenProvider.getAuthentication(token);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         }
+
         filterChain.doFilter(servletRequest, servletResponse);
     }
 }
