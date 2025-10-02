@@ -8,17 +8,24 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import ru.pro.model.dto.AuthenticationRequestDto;
 
+import java.util.Map;
+
 import static org.springframework.http.HttpStatus.NOT_IMPLEMENTED;
 
 @RequestMapping("/api/auth")
 public interface AuthApi {
     @PostMapping("/login")
-    default ResponseEntity<?> authenticate(@RequestBody AuthenticationRequestDto request) {
+    default ResponseEntity<?> authenticate(@RequestBody AuthenticationRequestDto request, HttpServletResponse response) {
         return new ResponseEntity<>(NOT_IMPLEMENTED);
     }
 
     @PostMapping("/logout")
     default ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response) {
+        return new ResponseEntity<>(NOT_IMPLEMENTED);
+    }
+
+    @PostMapping("/refresh")
+    default ResponseEntity<Map<String, String>> refresh(HttpServletRequest request) {
         return new ResponseEntity<>(NOT_IMPLEMENTED);
     }
 }

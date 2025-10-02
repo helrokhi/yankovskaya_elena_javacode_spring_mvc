@@ -21,18 +21,25 @@ public class AuthController implements AuthApi {
     private final AuthService authService;
 
     @Override
-    public ResponseEntity<?> authenticate(@Valid @RequestBody AuthenticationRequestDto request) {
-        String token = authService.authenticate(request);
-        Map<String, String> response = Map.of(
+    public ResponseEntity<?> authenticate(@Valid @RequestBody AuthenticationRequestDto request,
+                                          HttpServletResponse response) {
+        String token = authService.authenticate(request, response);
+        Map<String, String> resp = Map.of(
                 "login", request.login(),
                 "token", token
         );
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(resp);
     }
 
     @Override
     public ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response) {
         authService.logout(request, response);
         return ResponseEntity.status(OK).body("Logged out successfully");
+    }
+
+    @Override
+    public ResponseEntity<Map<String, String>> refresh(HttpServletRequest request) {
+        String newAccessToken = authService.refreshToken(request);
+        return ResponseEntity.ok(Map.of("accessToken", newAccessToken));
     }
 }

@@ -16,14 +16,17 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
-import ru.pro.exception.JwtAuthenticationException;
 import ru.pro.annotations.AuthLog;
+import ru.pro.exception.JwtAuthenticationException;
+import ru.pro.model.enums.TokenType;
 
 import javax.crypto.SecretKey;
 import java.util.Base64;
 import java.util.Date;
 
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
+import static ru.pro.model.enums.TokenType.ACCESS;
+import static ru.pro.model.enums.TokenType.REFRESH;
 
 @Slf4j
 @Component
@@ -49,23 +52,14 @@ public class JwtTokenProvider {
     }
 
     @AuthLog(action = "JWT_CREATED")
-    public String createToken(String username, String role) {
-        log.info("Creating token for user: {}", username);
+    public String createAccessToken(String username, String role) {
+        log.info("Creating access token for user: {}", username);
+        return createToken(username, role, validityInMilliseconds * 1000, ACCESS);
+    }
 
-        Claims claims = Jwts.claims()
-                .add("sub", username)
-                .add("role", role)
-                .build();
-
-        Date now = new Date();
-        Date validity = new Date(now.getTime() + validityInMilliseconds * 1000);
-
-        return Jwts.builder()
-                .claims(claims)
-                .issuedAt(now)
-                .expiration(validity)
-                .signWith(secretKey)
-                .compact();
+    public String createRefreshToken(String username, String role) {
+        log.info("Creating refresh token for {}", username);
+        return createToken(username, role, 7L * 24 * 60 * 60 * 1000, REFRESH);
     }
 
     public void validateToken(String token) {
@@ -103,5 +97,23 @@ public class JwtTokenProvider {
 
     public String resolveToken(HttpServletRequest request) {
         return request.getHeader(authorizationHeader);
+    }
+
+    private String createToken(String username, String role, long time, TokenType type) {
+        Claims claims = Jwts.claims()
+                .add("sub", username)
+                .add("role", role)
+                .add("type", type)
+                .build();
+
+        Date now = new Date();
+        Date validity = new Date(now.getTime() + time);
+
+        return Jwts.builder()
+                .claims(claims)
+                .issuedAt(now)
+                .expiration(validity)
+                .signWith(secretKey)
+                .compact();
     }
 }
