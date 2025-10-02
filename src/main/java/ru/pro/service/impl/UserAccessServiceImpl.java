@@ -5,12 +5,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.pro.annotations.AuthLog;
 import ru.pro.repository.UserAccessRepository;
+import ru.pro.security.LoginAttemptCache;
 import ru.pro.service.UserAccessService;
 
 @Service
 @RequiredArgsConstructor
 public class UserAccessServiceImpl implements UserAccessService {
     private final UserAccessRepository userAccessRepository;
+    private final LoginAttemptCache loginAttemptCache;
 
     @Override
     @Transactional
@@ -29,5 +31,9 @@ public class UserAccessServiceImpl implements UserAccessService {
             userAccess.setAccountNonLocked(true);
             userAccessRepository.save(userAccess);
         });
+
+        if (loginAttemptCache.isBlocked(login)) {
+            loginAttemptCache.loginSucceeded(login);
+        }
     }
 }
