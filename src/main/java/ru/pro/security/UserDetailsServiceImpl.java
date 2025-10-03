@@ -30,9 +30,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                     return new UsernameNotFoundException("UserAccess doesn't exist");
                 });
 
-        log.info("UserAccess  {} / {} / {}",
+        log.info("UserAccess  {} / {}",
                 userAccess.getLogin(),
-                userAccess.getPassword(),
                 userAccess.getRole());
 
         Collection<? extends GrantedAuthority> authorities =
@@ -42,7 +41,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         log.info("authorities {}", authorities);
         return new User(
                 userAccess.getLogin(),
-                userAccess.getPassword(),
+                "",
                 authorities
         );
     }

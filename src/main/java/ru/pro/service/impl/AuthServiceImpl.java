@@ -3,7 +3,9 @@ package ru.pro.service.impl;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -27,13 +29,20 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public UserDto loadUser(OAuth2UserRequest userRequest) {
-        OAuth2User oAuth2User = oAuth2UserService.loadUser(userRequest);
-        String login = oAuth2User.getName();
+    public UserDto loadUser(Authentication authentication) {
+        String login = authentication.getName();
 
         return userAccessRepository
                 .findByLogin(login)
                 .map(userMapper::toDto)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with login: " + login));
+    }
+
+    @Transactional
+    public void unlockUser(String login) {
+        userAccessRepository.findByLogin(login).ifPresent(user -> {
+            user.setAccountNonLocked(true);
+            userAccessRepository.save(user);
+        });
     }
 }

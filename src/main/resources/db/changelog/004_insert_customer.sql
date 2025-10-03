@@ -1,6 +1,6 @@
 --liquibase formatted sql
 --preconditions onFail:HALT onError:HALT
---changeset Elena_Yankovskaya:007
+--changeset Elena_Yankovskaya:004
 
 INSERT INTO customers
     (id, first_name, last_name, contact_number, created_at, updated_at)

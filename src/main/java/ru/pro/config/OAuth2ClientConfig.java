@@ -21,7 +21,7 @@ public class OAuth2ClientConfig {
     @Bean
     public ClientRegistrationRepository clientRegistrationRepository() throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        JsonNode json = mapper.readTree(resourceLoader.getResource("classpath:google-oauth.json").getInputStream())
+        JsonNode json = mapper.readTree(resourceLoader.getResource("classpath:google-oauth1.json").getInputStream())
                 .path("web");
 
         ClientRegistration registration = ClientRegistration.withRegistrationId("google")

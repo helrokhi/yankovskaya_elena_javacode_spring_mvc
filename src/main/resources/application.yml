@@ -16,13 +16,3 @@ spring:
     console:
       enabled: true
       path: /h2-console
-
-  redis:
-    host: localhost
-    port: 6379
-    password:
-
-jwt:
-  secret: "nH8g1l9R8f2+PjKdM2Xk5wE3bRzZ+qKJ8yLFO0VmV6Y="
-  header: "Authorization"
-  expiration: 3600

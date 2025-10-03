@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import ru.pro.exception.ApiException;
-import ru.pro.exception.JwtAuthenticationException;
 import ru.pro.exception.wrappers.ErrorResponse;
 
 import java.sql.Timestamp;
@@ -110,18 +109,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex) {
         logAtLevel(FORBIDDEN, "ACCESS_DENIED", ex);
         return handleError(FORBIDDEN, "ACCESS_DENIED", "Доступ к ресурсу запрещен", ex);
-    }
-
-    // --- Обработка JwtAuthenticationException ---
-    @ExceptionHandler(JwtAuthenticationException.class)
-    public ResponseEntity<ErrorResponse> handleJwtAuthentication(JwtAuthenticationException ex) {
-        logAtLevel(ex.getHttpStatus(), "JWT_AUTH_ERROR", ex);
-        return handleError(
-                ex.getHttpStatus(),
-                "JWT_AUTH_ERROR",
-                ex.getMessage(),
-                ex
-        );
     }
 
     // --- Универсальный обработчик для остальных исключений ---

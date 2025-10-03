@@ -7,13 +7,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static ru.pro.model.enums.Permission.ORDER_CREATE;
-import static ru.pro.model.enums.Permission.ORDER_READ_ALL;
-import static ru.pro.model.enums.Permission.ORDER_READ_OWN;
-import static ru.pro.model.enums.Permission.PRODUCT_CREATE;
-import static ru.pro.model.enums.Permission.PRODUCT_DELETE;
-import static ru.pro.model.enums.Permission.PRODUCT_READ;
-import static ru.pro.model.enums.Permission.PRODUCT_UPDATE;
+import static ru.pro.model.enums.Permission.CUSTOMER_READ;
+import static ru.pro.model.enums.Permission.CUSTOMER_UPDATE;
 import static ru.pro.model.enums.Permission.USER_READ;
 import static ru.pro.model.enums.Permission.USER_UPDATE;
 
@@ -21,30 +16,14 @@ import static ru.pro.model.enums.Permission.USER_UPDATE;
 @RequiredArgsConstructor
 public enum UserRole {
     USER(Set.of(
-            PRODUCT_READ,
-            ORDER_CREATE,
-            ORDER_READ_OWN
+            USER_READ,
+            CUSTOMER_READ
     )),
-
-    MODERATOR(Set.of(
-            PRODUCT_READ,
-            PRODUCT_CREATE,
-            PRODUCT_UPDATE,
-            ORDER_READ_ALL,
+    ADMIN(Set.of(
+            USER_READ,
             USER_UPDATE,
-            USER_READ
-    )),
-
-    SUPER_ADMIN(Set.of(
-            PRODUCT_READ,
-            PRODUCT_CREATE,
-            PRODUCT_UPDATE,
-            PRODUCT_DELETE,
-            ORDER_CREATE,
-            ORDER_READ_OWN,
-            ORDER_READ_ALL,
-            USER_UPDATE,
-            USER_READ
+            CUSTOMER_READ,
+            CUSTOMER_UPDATE
     ));
 
     private final Set<Permission> permissions;

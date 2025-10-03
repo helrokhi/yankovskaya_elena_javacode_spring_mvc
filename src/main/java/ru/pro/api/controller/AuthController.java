@@ -4,9 +4,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import ru.pro.api.AuthApi;
 import ru.pro.model.dto.UserDto;
@@ -26,7 +29,14 @@ public class AuthController implements AuthApi {
     }
 
     @Override
-    public ResponseEntity<UserDto> loadUser(OAuth2UserRequest userRequest) {
-        return ResponseEntity.ok(authService.loadUser(userRequest));
+    public ResponseEntity<UserDto> loadUser(Authentication authentication) {
+        return ResponseEntity.ok(authService.loadUser(authentication));
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('user:update')")
+    public ResponseEntity<Void> unlockUser(@PathVariable String login) {
+        authService.unlockUser(login);
+        return ResponseEntity.ok().build();
     }
 }

@@ -32,9 +32,6 @@ public class UserAccess {
     @Column(nullable = false, unique = true)
     private String login;
 
-    @Column(nullable = false)
-    private String password;
-
     @Enumerated(EnumType.STRING)
     private UserRole role = USER;
 

@@ -6,17 +6,10 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum Permission {
-    PRODUCT_READ("product:read"),
-    PRODUCT_CREATE("product:create"),
-    PRODUCT_UPDATE("product:update"),
-    PRODUCT_DELETE("product:delete"),
-
-    ORDER_CREATE("order:create"),
-    ORDER_READ_OWN("order:read:own"),
-    ORDER_READ_ALL("order:read:all"),
-
+    USER_READ("user:read"),
     USER_UPDATE("user:update"),
-    USER_READ("user:read");
+    CUSTOMER_READ("customer:read"),
+    CUSTOMER_UPDATE("customer:update");
 
     private final String permission;
 }
