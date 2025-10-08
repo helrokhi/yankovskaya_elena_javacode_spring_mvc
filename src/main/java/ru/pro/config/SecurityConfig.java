@@ -12,8 +12,6 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 
-import static org.springframework.http.HttpMethod.GET;
-
 @Configuration
 @EnableMethodSecurity
 @RequiredArgsConstructor
@@ -31,8 +29,10 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/login").permitAll()
                         .anyRequest().authenticated()
                 )
-                .oauth2Login(oauth -> oauth
+                .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfo -> userInfo.userService(oAuth2UserService))
+                        .defaultSuccessUrl("/", true)
+                        .failureUrl("/login?error")
                 )
                 .logout(logout -> logout
                         .logoutUrl("/api/auth/logout")
